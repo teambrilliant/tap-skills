@@ -18,7 +18,7 @@ Codebase: [repo name or directory name]
 ### Documentation
 - CLAUDE.md: [status and quality assessment]
 - AGENTS.md: [status or "missing"]
-- ADRs: [status, count, or "none"]
+- Architecture decisions: [.tap/architecture.md seeded / existing / "none discovered"]
 
 ### MCP Servers (.mcp.json)
 - ✓/✗ [server name] → [what it enables]

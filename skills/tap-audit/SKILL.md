@@ -122,7 +122,9 @@ Prioritize by: cheapest fix that unblocks the most agent autonomy.
 
 Create `.tap/` directory if it doesn't exist. Write the assessment using the template in references/tap-audit-template.md.
 
-If `.tap/architecture.md` doesn't exist and ADRs are discoverable from the codebase (e.g., patterns that clearly reflect deliberate decisions), seed it with discovered decisions.
+If `.tap/architecture.md` doesn't exist and architectural decisions are discoverable from the codebase (e.g., patterns that clearly reflect deliberate choices), seed it in compressed format. See [references/architecture-format.md](references/architecture-format.md) for the format.
+
+**Do NOT create individual ADR files.** Everything goes in one `.tap/architecture.md` — optimized for agent consumption, not human learning.
 
 ### 5. Present Findings
 
