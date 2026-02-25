@@ -1,0 +1,9 @@
+{
+  "name": "tap-skills",
+  "description": "TAP methodology skills for autonomous agent development. Assesses repo readiness, runs browser-based QA, analyzes blast radius of changes, monitors system health, and drives retrospectives. Built for teams where humans + agents ship together.",
+  "version": "0.1.0",
+  "author": {
+    "name": "Team Brilliant",
+    "url": "https://teambrilliant.ai"
+  }
+}
