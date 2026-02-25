@@ -16,7 +16,8 @@ This skill does NOT describe coding conventions — that's CLAUDE.md's job. This
 3. Score readiness
 4. Identify leverage points
 5. Write `.tap/tap-audit.md`
-6. Present findings (human) or proceed to task (agent)
+6. Seed `.tap/architecture.md`
+7. Present findings (human) or proceed to task (agent)
 
 ### 1. Scan the Repo
 
@@ -122,11 +123,23 @@ Prioritize by: cheapest fix that unblocks the most agent autonomy.
 
 Create `.tap/` directory if it doesn't exist. Write the assessment using the template in references/tap-audit-template.md.
 
-If `.tap/architecture.md` doesn't exist and architectural decisions are discoverable from the codebase (e.g., patterns that clearly reflect deliberate choices), seed it in compressed format. See [references/architecture-format.md](references/architecture-format.md) for the format.
+### 5. Seed .tap/architecture.md
 
-**Do NOT create individual ADR files.** Everything goes in one `.tap/architecture.md` — optimized for agent consumption, not human learning.
+**Always do this step.** If `.tap/architecture.md` doesn't already exist, create it now.
 
-### 5. Present Findings
+Scan the codebase for deliberate architectural decisions — they're visible as:
+- Consistent patterns across the codebase (same error handling everywhere)
+- Config that implies decisions (Temporal config, ORM choice, auth provider)
+- Package choices that constrain patterns (Result library, specific framework)
+- Comments or docs explaining "why" something is done a certain way
+
+Write each decision in compressed format: 2-4 lines max. Capture the **principle** behind the decision so agents can apply it to novel situations. See [references/architecture-format.md](references/architecture-format.md) for format and examples.
+
+**Do NOT create individual ADR files.** Everything goes in one `.tap/architecture.md` — one file, ~50 lines, optimized for agent consumption.
+
+If `.tap/architecture.md` already exists, review it against what you discovered and note any missing decisions in the Approach Gaps section of tap-audit.md.
+
+### 6. Present Findings
 
 **Human mode (default):**
 - Summarize readiness score and what it means
@@ -135,7 +148,7 @@ If `.tap/architecture.md` doesn't exist and architectural decisions are discover
 - Ask if they want to address any leverage points now
 
 **Agent mode (invoked with `--agent` or in automated pipeline):**
-- Write .tap/tap-audit.md silently
+- Write .tap/tap-audit.md and .tap/architecture.md silently
 - Log readiness score
 - Proceed to assigned task
 
