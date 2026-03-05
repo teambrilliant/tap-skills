@@ -11,6 +11,7 @@ This skill does NOT describe coding conventions — that's CLAUDE.md's job. This
 
 ## Process
 
+0. Check existing audit
 1. Scan the repo
 2. Assess each dimension
 3. Score readiness
@@ -18,6 +19,27 @@ This skill does NOT describe coding conventions — that's CLAUDE.md's job. This
 5. Write `.tap/tap-audit.md`
 6. Seed `.tap/architecture.md`
 7. Present findings (human) or proceed to task (agent)
+
+### 0. Check Existing Audit
+
+If `.tap/tap-audit.md` exists, read it before doing anything else.
+
+1. Parse `Last run:` date from the file.
+2. Run `git log --oneline --since="[date]"` to count commits since last audit.
+3. Check if key config files changed since that date: `git diff --name-only HEAD@{[date]} -- .claude/ .mcp.json package.json .github/workflows/ CLAUDE.md`
+
+**Decision tree:**
+
+| Condition | Action |
+|-----------|--------|
+| `--force` flag | Full re-run (skip to step 1) |
+| <30 days old, no key config changes | **Summary mode**: print score + top leverage points + audit age. Say "Audit is current ([N] days). Use `--force` to re-scan." **STOP.** |
+| <30 days old, key config changed | **Delta mode**: re-assess only affected dimensions. Update `.tap/tap-audit.md` in-place with new `Last run:` date. Skip unchanged sections. |
+| >=30 days old, significant repo activity (many commits, new contributors) | Recommend full re-run. Ask before proceeding. |
+| >=30 days old, low activity (few commits, same contributors) | **Summary mode**: the audit is likely still accurate. Print score + leverage points. Say "Audit is [N] days old but repo activity is low. Use `--force` to re-scan." **STOP.** |
+| Date missing or unparseable | Full re-run (skip to step 1) |
+
+The audit file IS the cache. Don't re-scan what hasn't changed.
 
 ### 1. Scan the Repo
 
