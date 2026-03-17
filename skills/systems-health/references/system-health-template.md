@@ -34,6 +34,16 @@ Repo: [repo name]
 ### Broken or Weak
 - [loop name]: [evidence of failure]
 
+## Complexity Signals
+| Signal | Value | 30d trend | Signal |
+|--------|-------|-----------|--------|
+| Files per commit (median) | [n] | ▲/▼/─ | [healthy/concern] |
+| Shotgun surgery (5+ files, 3+ dirs) | [n]% of commits | ▲/▼/─ | [healthy/concern] |
+| Hot files (most-changed + largest) | [list top 3] | | [healthy/concern] |
+| PRs without test changes | [n]% | ▲/▼/─ | [healthy/concern] |
+
+[1-2 sentence interpretation: complexity accumulating / stable / improving]
+
 ## Diagnosis
 ### 1. [what's sick]
 - Evidence: [data]

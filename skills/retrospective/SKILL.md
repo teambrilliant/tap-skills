@@ -73,6 +73,12 @@ For each problem found, classify the root cause:
 - No browser QA setup
 - CI doesn't catch the type of failure that occurred
 
+**Design gap** — the code itself was too complex to modify safely
+- God file / high coupling → agent change broke unrelated behavior (change amplification)
+- Inconsistent patterns → agent followed one pattern, should have followed another
+- Pass-through layers → agent modified the wrong layer
+- No clear module boundaries → agent couldn't isolate the change
+
 **Scope gap** — agent took on work it shouldn't have
 - No AGENTS.md boundaries
 - Task was too ambiguous for autonomous execution
@@ -111,6 +117,12 @@ Each learning that requires work becomes a ticket. Categorize by impact on agent
 - Update CLAUDE.md with discovered pattern
 - Add tests for uncovered area
 - Capture decision in .tap/architecture.md
+
+**Reduces design complexity:**
+- Split god file into focused modules
+- Collapse pass-through layers
+- Standardize inconsistent patterns
+- Extract shared code to reduce coupling
 
 **Human mode**: Present findings. Propose tickets. Ask: "Which of these should we create issues for?"
 

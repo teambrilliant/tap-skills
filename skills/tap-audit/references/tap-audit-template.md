@@ -42,12 +42,19 @@ Codebase: [repo name or directory name]
 - [test type]: [status]
 [for each type: unit, integration, acceptance, e2e, browser]
 
+### Design Complexity: [Easy / Moderate / Hard] to modify
+Sampled [n] most-changed files.
+- [file] — [size, imports, observation]
+- [file] — [size, imports, observation]
+- [file] — [size, imports, observation]
+[1 sentence interpretation]
+
 ### Readiness Score: [FULL / PARTIAL / MINIMAL]
 [1-2 sentence summary: what agent CAN do, what it CANNOT do, key gaps]
 
 ## Approach Gaps
 - [gap description — what's missing and why it matters for agents]
-[for each identified gap]
+[for each identified gap, including design smells from complexity spot check]
 
 ## Process
 - Branching: [strategy]

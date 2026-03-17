@@ -13,9 +13,10 @@ Map the impact surface of changes. Help humans focus their limited attention on 
 2. Summarize intent
 3. Map impact surface
 4. Assess risk level
-5. Generate verification checklist
-6. Flag suspicious patterns
-7. Present findings
+5. Identify blind spots (MEDIUM/HIGH only)
+6. Generate verification checklist
+7. Flag suspicious patterns
+8. Present findings
 
 ### 1. Get the Diff
 
@@ -82,7 +83,31 @@ For each changed file, trace the impact outward:
 - Architecture-level changes (routing, middleware, providers)
 - Changes with zero test coverage on critical paths
 
-### 5. Generate Verification Checklist
+### 5. Identify Blind Spots (MEDIUM/HIGH only)
+
+Surface what the static analysis CAN'T see. Scan the diff for patterns that indicate hidden dependencies, grounded in Ousterhout's complexity symptoms:
+
+**Obscurity** — behavior depends on information not visible in the diff:
+- Env vars, config files, feature flags, runtime values
+- Conditional logic driven by external state
+
+**Hidden dependencies** — connections not traceable via static imports:
+- Dynamic dispatch, event emitters/listeners, pub/sub, message queues
+- Webhook contracts, callback registrations
+- String-based lookups, reflection, dynamic requires
+
+**Change amplification risk** — external consumers of changed interfaces where the full set of consumers is unknown:
+- API response shapes consumed by external clients
+- Shared DB tables read by other services
+- Published events consumed by unknown subscribers
+
+Each blind spot states: [what's hidden] — [why it matters for this PR].
+
+Merge blind spots that overlap with Verification Checklist items into the checklist instead of duplicating. Remaining blind spots feed additional checklist items.
+
+Skip this section entirely for LOW risk PRs.
+
+### 6. Generate Verification Checklist
 
 Produce a concrete list of things to manually test. Be specific — pages, flows, inputs, edge cases.
 
@@ -96,10 +121,11 @@ Include:
 - **Edge cases**: Error states, empty states, boundary inputs
 - **Regressions**: Flows through UNCHANGED code that depends on changed code
 - **Environment-specific**: If `.tap/tap-audit.md` has URLs, reference specific environments
+- **Blind spot items**: For MEDIUM/HIGH, items surfaced by blind spot analysis
 
 Prioritize the checklist: most likely to break first, most damaging if broken second.
 
-### 6. Flag Suspicious Patterns
+### 7. Flag Suspicious Patterns
 
 Call out anything that doesn't look right:
 
@@ -110,7 +136,7 @@ Call out anything that doesn't look right:
 - **Hardcoded values**: Magic numbers, URLs, credentials
 - **Test gaps**: Modified behavior with no corresponding test updates
 
-### 7. Present Findings
+### 8. Present Findings
 
 Use the template in [references/blast-radius-template.md](references/blast-radius-template.md).
 

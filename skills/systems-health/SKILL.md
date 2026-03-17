@@ -13,8 +13,9 @@ Diagnose the development system. Measure stocks, flows, and feedback loops. Find
 2. Measure stocks
 3. Measure flows
 4. Assess feedback loops
-5. Diagnose and prescribe
-6. Write .tap/system-health.md
+5. Measure complexity signals
+6. Diagnose and prescribe
+7. Write .tap/system-health.md
 
 ### 1. Collect Data
 
@@ -97,7 +98,22 @@ Identify which loops are working and which are broken.
 
 **Evidence-based assessment**: Don't guess. Check CI pass rate (from `gh run list`), review turnaround (from PR data), bug trends (from issue data).
 
-### 5. Diagnose and Prescribe
+### 5. Measure Complexity Signals
+
+Track whether the codebase is getting harder to work with over time. Based on Ousterhout's three symptoms of complexity — all derived from git data.
+
+| Signal | What to measure | How | Concern threshold |
+|--------|----------------|-----|-------------------|
+| Change amplification | Median files per commit (30d vs 90d) | `git log --shortstat` | Trending up |
+| Shotgun surgery | % of commits touching 5+ files across 3+ directories | `git log --shortstat` + `git show --name-only` | > 20% of commits |
+| Cognitive load | Top 5 most-changed files in 30d — flag any that are also among the largest | `git log --name-only` + file sizes | Large files with high churn |
+| Unknown unknowns | % of merged PRs where no test file was changed | `gh pr list --state merged` + diff per PR | Trending up |
+
+Present as a compact table with one interpretation line summarizing the overall complexity trend (accumulating / stable / improving).
+
+If complexity is accumulating, feed into Diagnosis with specific interventions: split a god file, add tests to a hot path, extract a module.
+
+### 6. Diagnose and Prescribe
 
 For each problem found, follow the pattern:
 
@@ -116,7 +132,7 @@ Prioritize by: most impact for least effort.
 - Broken feedback loop → identify who/what stopped responding to the signal
 - No feedback loop → suggest creating one (tests, CI gate, review process)
 
-### 6. Write Output
+### 7. Write Output
 
 Write to `.tap/system-health.md` using the template in [references/system-health-template.md](references/system-health-template.md).
 

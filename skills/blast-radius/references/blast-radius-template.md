@@ -29,6 +29,11 @@ Risk Level: [LOW / MEDIUM / HIGH]
 - Covered: [what's tested]
 - Gaps: [what's NOT tested that could break]
 
+## Blind Spots
+[Omit this section for LOW risk PRs]
+- [what's hidden] — [why it matters for this PR]
+[or "None detected"]
+
 ## Verification Checklist
 □ [page/flow] — [what to verify] — [why]
 □ [page/flow] — [what to verify] — [why]

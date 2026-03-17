@@ -113,12 +113,30 @@ Assess six areas. Mark ✓ (available) or ✗ (missing/incomplete) for each item
 - **PARTIAL**: Agent can implement and run some tests. Missing some integrations. CLAUDE.md exists but has gaps.
 - **MINIMAL**: Agent can read/write code but can't run tests, no MCP servers, thin or missing CLAUDE.md.
 
+#### Design Complexity
+
+Quick spot check on how hard this codebase is to modify. Sample the 5-10 most-changed files recently (`git log --name-only --since="30 days ago"`) — these are what agents will touch most.
+
+For each sampled file, check:
+- **File size** — proxy for module depth. Large files doing too much = hard to understand, easy to break
+- **Import fanout** — proxy for coupling. Many imports = many dependencies = change amplification risk
+- **Layer structure** — pass-through wrappers, thin abstractions that add interface cost without hiding complexity
+- **Consistency** — do similar things follow similar patterns, or does each file invent its own approach
+
+Rate overall: **Easy** / **Moderate** / **Hard** to modify.
+- **Easy**: small focused modules, low coupling, consistent patterns
+- **Moderate**: some large files or high coupling, but patterns are clear
+- **Hard**: god files, high coupling, inconsistent patterns, pass-through layers
+
+Specific design smells found flow into Approach Gaps as actionable items.
+
 #### Approach Gaps
 
 Don't repeat CLAUDE.md. Flag what's MISSING that causes agent rework:
 - Test coverage gaps (which areas have no tests?)
 - Missing ADRs (where do agents guess at architectural intent?)
 - Undocumented patterns (inconsistencies agents will copy?)
+- Design smells from the complexity spot check (god files to split, pass-through layers to collapse, inconsistent patterns to standardize)
 
 #### Process
 
