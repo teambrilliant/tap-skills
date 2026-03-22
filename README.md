@@ -30,6 +30,7 @@ Or install directly from GitHub:
 | `/tap-skills:blast-radius`   | Impact analysis of PR changes before merging                |
 | `/tap-skills:systems-health` | Measure dev system health via stocks, flows, feedback loops |
 | `/tap-skills:retrospective`  | Just-in-time retro focused on improving agent autonomy      |
+| `/tap-skills:tech-roadmap`   | Build 12-month outcome-based tech roadmap for CEO/board     |
 
 ## How they work together
 
