@@ -52,6 +52,31 @@ Sampled [n] most-changed files.
 ### Readiness Score: [FULL / PARTIAL / MINIMAL]
 [1-2 sentence summary: what agent CAN do, what it CANNOT do, key gaps]
 
+### Feedback Loops
+
+Top 3 agent workflows assessed:
+
+#### 1. [workflow name] — [Closed / Open / No] loop
+- Generator: [what produces the output]
+- Evaluator: [what verifies it, or "missing"]
+- Handoff: [how context persists across resets, or "missing"]
+- Grading: [measurable criteria, or "missing"]
+- Rx: [concrete fix if not closed — specific skill, MCP, hook, or test to add]
+
+#### 2. [workflow name] — [Closed / Open / No] loop
+- Generator: [what produces the output]
+- Evaluator: [what verifies it, or "missing"]
+- Handoff: [how context persists across resets, or "missing"]
+- Grading: [measurable criteria, or "missing"]
+- Rx: [concrete fix if not closed]
+
+#### 3. [workflow name] — [Closed / Open / No] loop
+- Generator: [what produces the output]
+- Evaluator: [what verifies it, or "missing"]
+- Handoff: [how context persists across resets, or "missing"]
+- Grading: [measurable criteria, or "missing"]
+- Rx: [concrete fix if not closed]
+
 ## Approach Gaps
 - [gap description — what's missing and why it matters for agents]
 [for each identified gap, including design smells from complexity spot check]

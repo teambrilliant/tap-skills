@@ -130,6 +130,25 @@ Rate overall: **Easy** / **Moderate** / **Hard** to modify.
 
 Specific design smells found flow into Approach Gaps as actionable items.
 
+#### Feedback Loops
+
+Identify the **top 3 workflows** an agent will perform most in this repo (e.g., implement feature, fix bug, generate assets, deploy, migrate data). For each, assess:
+
+| Element | What to look for |
+|---------|-----------------|
+| **Generator** | Can the agent produce the output? (code, assets, config) |
+| **Evaluator** | Can something *other than the generator* verify the output? (tests, lint, visual regression, Playwright, type checker) |
+| **Handoff** | Can the agent context-reset and resume? (shaped docs, plans, `.tap/` memory, clear commit history) |
+| **Grading criteria** | Are quality expectations measurable, not vibes? (test suites, lint rules, acceptance criteria, design specs) |
+
+Rate each workflow:
+
+- **Closed loop** — all four elements present. Agent can iterate autonomously.
+- **Open loop** — evaluator or grading criteria missing. Agent produces output but can't verify quality — human must inspect.
+- **No loop** — no evaluator, no criteria. Agent guesses and hopes.
+
+For each open/no loop, prescribe a concrete fix: a specific skill to create, MCP to wire up, hook to add, or test to write. Be specific — "add browser tests" is too vague; "add Playwright acceptance tests for the onboarding flow using /design-acceptance-tests" is actionable.
+
 #### Approach Gaps
 
 Don't repeat CLAUDE.md. Flag what's MISSING that causes agent rework:
@@ -182,6 +201,19 @@ If `.tap/architecture.md` already exists, review it against what you discovered 
 ### 6. Present Findings
 
 **Human mode (default):**
+
+Always open with the signature block:
+
+```
+`★ Audit View ────────────────────────────────────`
+[repo name] — [readiness score]
+  ├─ [top feedback loop finding]
+  ├─ [#1 leverage point]
+  └─ [cheapest fix to start with]
+`─────────────────────────────────────────────────`
+```
+
+Then:
 - Summarize readiness score and what it means
 - Highlight top 2-3 leverage points
 - Propose the single cheapest fix to start with
