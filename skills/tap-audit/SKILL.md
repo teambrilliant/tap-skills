@@ -132,11 +132,18 @@ Specific design smells found flow into Approach Gaps as actionable items.
 
 #### Feedback Loops
 
-Identify the **top 3 workflows** an agent will perform most in this repo (e.g., implement feature, fix bug, generate assets, deploy, migrate data). For each, assess:
+Discover the **top 3 workflows** in this repo — both automated and manual. Look at:
+- What agents already do (git log, CI runs, existing scripts)
+- What humans do manually that agents could do (asset creation, visual QA, deploy steps, data migrations, config changes)
+- What the product requires that nobody has automated yet (scan the codebase for manual steps: shell scripts with TODOs, README instructions that say "run X manually", assets committed by hand without generation scripts)
+
+Evidence of manual workflows: assets without generation scripts, hand-edited config files, manual deploy steps in docs, shell scripts that require human judgment, screenshots committed without automated capture.
+
+For each workflow, assess:
 
 | Element | What to look for |
 |---------|-----------------|
-| **Generator** | Can the agent produce the output? (code, assets, config) |
+| **Generator** | Can an agent produce the output? If not, what's missing — a skill, an MCP, a CLI tool, an API? |
 | **Evaluator** | Can something *other than the generator* verify the output? (tests, lint, visual regression, Playwright, type checker) |
 | **Handoff** | Can the agent context-reset and resume? (shaped docs, plans, `.tap/` memory, clear commit history) |
 | **Grading criteria** | Are quality expectations measurable, not vibes? (test suites, lint rules, acceptance criteria, design specs) |
@@ -146,8 +153,9 @@ Rate each workflow:
 - **Closed loop** — all four elements present. Agent can iterate autonomously.
 - **Open loop** — evaluator or grading criteria missing. Agent produces output but can't verify quality — human must inspect.
 - **No loop** — no evaluator, no criteria. Agent guesses and hopes.
+- **Manual** — human does this entirely by hand. No agent involvement yet.
 
-For each open/no loop, prescribe a concrete fix: a specific skill to create, MCP to wire up, hook to add, or test to write. Be specific — "add browser tests" is too vague; "add Playwright acceptance tests for the onboarding flow using /design-acceptance-tests" is actionable.
+For each non-closed workflow, prescribe a concrete automation path: a specific skill to create, MCP to wire up, hook to add, CLI tool to integrate, or external service to connect. Be specific — "add browser tests" is too vague; "create a sprite-generation skill that uses nano-banana-pro MCP to generate pixel art PNGs, renders them in-app via dev-check.sh, and validates dimensions/palette" is actionable.
 
 #### Approach Gaps
 

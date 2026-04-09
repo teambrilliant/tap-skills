@@ -56,26 +56,26 @@ Sampled [n] most-changed files.
 
 Top 3 agent workflows assessed:
 
-#### 1. [workflow name] — [Closed / Open / No] loop
-- Generator: [what produces the output]
-- Evaluator: [what verifies it, or "missing"]
-- Handoff: [how context persists across resets, or "missing"]
-- Grading: [measurable criteria, or "missing"]
-- Rx: [concrete fix if not closed — specific skill, MCP, hook, or test to add]
+#### 1. [workflow name] — [Closed / Open / No loop / Manual]
+- Generator: [what produces the output, or "human does this manually"]
+- Evaluator: [what verifies it, or "missing — human inspects visually"]
+- Handoff: [how context persists, or "missing"]
+- Grading: [measurable criteria, or "missing — vibes-based"]
+- **Automate**: [concrete path — skill to create, MCP to wire, tool to integrate, with specifics]
 
-#### 2. [workflow name] — [Closed / Open / No] loop
-- Generator: [what produces the output]
+#### 2. [workflow name] — [Closed / Open / No loop / Manual]
+- Generator: [what produces the output, or "human does this manually"]
 - Evaluator: [what verifies it, or "missing"]
-- Handoff: [how context persists across resets, or "missing"]
+- Handoff: [how context persists, or "missing"]
 - Grading: [measurable criteria, or "missing"]
-- Rx: [concrete fix if not closed]
+- **Automate**: [concrete path]
 
-#### 3. [workflow name] — [Closed / Open / No] loop
-- Generator: [what produces the output]
+#### 3. [workflow name] — [Closed / Open / No loop / Manual]
+- Generator: [what produces the output, or "human does this manually"]
 - Evaluator: [what verifies it, or "missing"]
-- Handoff: [how context persists across resets, or "missing"]
+- Handoff: [how context persists, or "missing"]
 - Grading: [measurable criteria, or "missing"]
-- Rx: [concrete fix if not closed]
+- **Automate**: [concrete path]
 
 ## Approach Gaps
 - [gap description — what's missing and why it matters for agents]
