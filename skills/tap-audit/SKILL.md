@@ -132,12 +132,29 @@ Specific design smells found flow into Approach Gaps as actionable items.
 
 #### Feedback Loops
 
-Discover the **top 3 workflows** in this repo — both automated and manual. Look at:
-- What agents already do (git log, CI runs, existing scripts)
-- What humans do manually that agents could do (asset creation, visual QA, deploy steps, data migrations, config changes)
-- What the product requires that nobody has automated yet (scan the codebase for manual steps: shell scripts with TODOs, README instructions that say "run X manually", assets committed by hand without generation scripts)
+Discover the **top 3 workflows** in this repo — both automated and manual. Don't just check infrastructure (tests, CI, docs). The most valuable finding is a workflow humans do by hand that an agent could own.
 
-Evidence of manual workflows: assets without generation scripts, hand-edited config files, manual deploy steps in docs, shell scripts that require human judgment, screenshots committed without automated capture.
+**Active discovery — run these scans:**
+
+1. **Binary assets without generators** — scan for committed images, fonts, audio, video, PDFs. Check if corresponding generation scripts, Makefiles, or asset pipelines exist. If PNGs exist but no script produces them → manual workflow.
+   ```
+   Find: *.png, *.jpg, *.svg, *.gif, *.mp3, *.wav, *.pdf, *.ttf, *.otf
+   Then: look for Makefile, generate-*.sh, scripts/, asset pipeline, or build step that produces them
+   Missing generator = manual creation workflow
+   ```
+
+2. **Git history patterns** — files that get re-committed with small changes repeatedly suggest a manual iteration loop (human tweaks, checks, tweaks again). Look for binary files or config files with 5+ commits.
+   ```
+   git log --all --diff-filter=M --name-only --pretty=format: | sort | uniq -c | sort -rn | head -20
+   ```
+   Files with high re-commit counts without associated test/script changes = manual iteration.
+
+3. **Human-in-the-loop scripts** — scan shell scripts and docs for steps that require visual inspection, manual input, or judgment. Look for:
+   - Scripts that open a window/browser and wait for human to look
+   - README/CLAUDE.md steps phrased as "then you...", "manually...", "visually check...", "inspect the output"
+   - Scripts with `read`, `open`, `sleep` (waiting for human), or comments like "# check this looks right"
+
+4. **Workflow descriptions in docs** — read CLAUDE.md, README, and any contributing guides. Any multi-step process described in prose is a candidate for automation. Pay special attention to sequences like "first run X, then check Y, then run Z" — that's an unautomated pipeline.
 
 For each workflow, assess:
 
