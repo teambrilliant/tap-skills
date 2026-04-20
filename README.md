@@ -31,6 +31,7 @@ Or install directly from GitHub:
 | `/tap-skills:systems-health` | Measure dev system health via stocks, flows, feedback loops |
 | `/tap-skills:retrospective`  | Just-in-time retro focused on improving agent autonomy      |
 | `/tap-skills:tech-roadmap`   | Build 12-month outcome-based tech roadmap for CEO/board     |
+| `/tap-skills:curate-product-context` | Install and maintain `.tap/product.md` — product vision, focus, bets, non-goals |
 
 ## How they work together
 
@@ -66,6 +67,7 @@ Skills read and write to `.tap/` in the target repo:
   system-health.md  ← latest health metrics
   learnings.md      ← retrospective insights (append-only)
   architecture.md   ← discovered ADRs and design decisions
+  product.md        ← durable product context: what we build, focus, bets, non-goals
 ```
 
 ## Requirements

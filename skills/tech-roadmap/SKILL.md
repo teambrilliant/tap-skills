@@ -30,6 +30,7 @@ README.md / docs/                → product overview, architecture
 .tap/tap-audit.md                → prior readiness assessment
 .tap/architecture.md             → architectural decisions
 .tap/system-health.md            → development velocity data
+.tap/product.md                  → product vision / audience / current focus / bets / non-goals (if exists, reuse — do NOT re-capture in Step 3)
 package.json / Cargo.toml / etc. → stack, team structure signals
 git shortlog -sn --no-merges --since="12 months ago" → team size/activity
 git log --oneline --since="12 months ago" | wc -l    → velocity signal
@@ -87,7 +88,9 @@ If `.tap/tap-audit.md` exists, incorporate its readiness score and leverage poin
 
 ### 3. Define Product Vision
 
-If a product vision exists, use it. If not, help the CTO draft one.
+**If `.tap/product.md` exists**, use its `What we build`, `Audience & pain`, and `Current focus` sections as the product vision basis. Do NOT re-capture this content here — that's `/tap-skills:curate-product-context`'s job, and duplicating it creates conflicting sources of truth. Skip to Step 4.
+
+**If `.tap/product.md` does not exist**, help the CTO draft a vision below, and at the end of this session recommend running `/tap-skills:curate-product-context` to install durable product context for future roadmap work.
 
 A product vision describes the future you are trying to create for your customers over 3-10 years. It is NOT about revenue targets or quarterly goals — it's about how customers' lives will be better.
 

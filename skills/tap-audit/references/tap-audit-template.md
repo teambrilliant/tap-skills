@@ -20,6 +20,12 @@ Codebase: [repo name or directory name]
 - AGENTS.md: [status or "missing"]
 - Architecture decisions: [.tap/architecture.md seeded / existing / "none discovered"]
 
+### Strategic Context
+- ✓/✗ `.tap/product.md` exists
+- ✓/✗ ≤ 80 lines
+- ✓/✗ `mtime` within 90 days
+[1 sentence: what agents know or don't know about product direction from this repo's artifacts]
+
 ### MCP Servers (.mcp.json)
 - ✓/✗ [server name] → [what it enables]
 [for each configured + each missing-but-needed]

@@ -86,6 +86,12 @@ Assess six areas. Mark ✓ (available) or ✗ (missing/incomplete) for each item
 - AGENTS.md: exists? defines scope boundaries, escalation rules?
 - ADRs: any architectural decisions documented?
 
+**Strategic Context**
+- `.tap/product.md`: exists? ≤ 80 lines? `mtime` within 90 days?
+- If missing or stale, flag in Leverage Points with fix: run `/tap-skills:curate-product-context`
+
+This dimension assesses whether durable product-strategic context (what we build, audience, current focus, bets, non-goals) is installed as an agent-readable artifact. This skill does NOT author or modify `.tap/product.md` — that's `/tap-skills:curate-product-context`'s job.
+
 **MCP Servers** (from .mcp.json)
 - List each configured server and what it enables
 - Flag missing ones based on stack (e.g., using Postgres but no DB MCP; web app but no chrome-devtools)
