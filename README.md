@@ -32,6 +32,8 @@ Or install directly from GitHub:
 | `/tap-skills:retrospective`  | Just-in-time retro focused on improving agent autonomy      |
 | `/tap-skills:tech-roadmap`   | Build 12-month outcome-based tech roadmap for CEO/board     |
 | `/tap-skills:curate-product-context` | Install and maintain `.tap/product.md` — product vision, focus, bets, non-goals |
+| `/tap-skills:qa-smoke-catalog` | Explore a web app and build/update the `.tap/smoke-tests.md` release smoke-test catalog |
+| `/tap-skills:qa-smoke-run`   | Execute the smoke-test catalog in a browser and report only what's broken |
 
 ## How they work together
 
@@ -39,7 +41,8 @@ Or install directly from GitHub:
 Agent enters repo
       │
       ▼
-  /tap-audit ──► assess readiness, identify gaps
+  /tap-audit ──────────► assess readiness, identify gaps
+  /qa-smoke-catalog ───► build the release smoke-test catalog
       │
       ▼
   (implement + test using dev-skills)
@@ -49,6 +52,9 @@ Agent enters repo
       │
       ▼
   /blast-radius ──► human reviews impact, merges or rejects
+      │
+      ▼
+  /qa-smoke-run ──► execute the smoke catalog against the release
       │
       ▼
   /systems-health ──► measure how the system is performing
@@ -68,12 +74,15 @@ Skills read and write to `.tap/` in the target repo:
   learnings.md      ← retrospective insights (append-only)
   architecture.md   ← discovered ADRs and design decisions
   product.md        ← durable product context: what we build, focus, bets, non-goals
+  smoke-tests.md    ← release smoke-test catalog
+  qa-runs/          ← smoke-run failure artifacts (only written when a run fails)
 ```
 
 ## Requirements
 
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code)
 - `gh` CLI (for blast-radius, systems-health, retrospective)
+- Chrome DevTools MCP (for qa-smoke-catalog, qa-smoke-run)
 
 ## Companion plugin
 
