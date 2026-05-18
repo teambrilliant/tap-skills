@@ -63,6 +63,14 @@ Run (if tools available):
 - `git shortlog -sn --no-merges --since="90 days ago"` → contributors
 - `gh run list --limit 5` → recent CI runs
 - Test runner dry-run to discover test count
+- Feature-flag system discovery — grep for known providers and local conventions:
+  ```
+  rg -l "posthog|launchdarkly|unleash|flagsmith" --type-add 'config:*.{ts,js,json,yml,yaml}' -tts -tjs -tconfig
+  fd -e ts -e js 'flags?\.(ts|js)$' src/
+  rg "NEXT_PUBLIC_FEATURE_|_FEATURE_FLAG" .env.example
+  rg -l "feature_flags?" --type sql --type ts --type js
+  ```
+  Result feeds the "Feature flags" decision in step 5.
 
 ### 2. Assess Each Dimension
 
@@ -222,6 +230,7 @@ Scan the codebase for deliberate architectural decisions — they're visible as:
 - Config that implies decisions (Temporal config, ORM choice, auth provider)
 - Package choices that constrain patterns (Result library, specific framework)
 - Comments or docs explaining "why" something is done a certain way
+- **Feature flag system** — always capture this as its own decision (`## Feature flags`). Use the grep results from step 1. Record: provider (PostHog / LaunchDarkly / Unleash / Flagsmith / static config / DB-driven / env-var / "None — direct deploy only"), where flags are defined and read, naming convention if any. Downstream planning skills read this section verbatim — if no flag system exists, write `"None — direct deploy only"` explicitly so planners don't re-discover its absence on every plan.
 
 Write each decision in compressed format: 2-4 lines max. Capture the **principle** behind the decision so agents can apply it to novel situations. See [references/architecture-format.md](references/architecture-format.md) for format and examples.
 

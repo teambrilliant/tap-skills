@@ -52,7 +52,14 @@ Principle: router owns navigation, query library owns server state. Don't mix co
 ## State management
 No global state library. Server state in TanStack Query, UI state in component/context.
 Principle: most "state management" is actually server cache. Treat it that way.
+
+## Feature flags
+PostHog, server-side eval via `@repo/flags`. Flags defined in `src/flags/index.ts`; per-env via `POSTHOG_KEY`.
+Naming: snake_case, feature-scoped (e.g., `new_checkout_enabled`, `workflow_templates_pro`).
+Principle: flags serve two purposes — launch control (cohort, tier, timing, %) and reversibility (fast off-switch). One flag per feature, at the user-visible boundary.
 ```
+
+The "Feature flags" decision is mandatory if any flag system exists in the codebase — downstream planning skills (dev-skills' rollout-primitives) read this section to know which provider, where flags live, and how to gate a new feature. If no flag system exists, state that explicitly: `"None — direct deploy only"` so planners don't spend cycles re-discovering its absence.
 
 ## What NOT to include
 
@@ -68,6 +75,7 @@ During `/tap-audit`, scan for discoverable decisions:
 - Consistent patterns across the codebase (same error handling everywhere = deliberate choice)
 - Config that implies decisions (Temporal config = chose Temporal for background jobs)
 - Package choices that constrain patterns (Drizzle = ORM-first data access)
+- **Feature flag system** — grep for `posthog`, `launchdarkly`, `unleash`, `flagsmith`, or local conventions (`flags.ts`, `feature-flags.yml`, env-var patterns like `*_FEATURE_*` / `NEXT_PUBLIC_FEATURE_*`, DB tables like `feature_flags`). If found, capture provider + where flags are defined + naming convention. If none found, write `"None — direct deploy only"` explicitly.
 - Existing docs/ADRs that can be compressed
 
 Only seed decisions you're confident about from the code evidence. Don't speculate.
