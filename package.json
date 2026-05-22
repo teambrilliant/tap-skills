@@ -1,0 +1,30 @@
+{
+  "name": "@teambrilliant/tap-skills",
+  "version": "0.8.0",
+  "description": "Team Brilliant operating-system skills for human+agent dev teams: repo readiness, blast radius, smoke tests, system health, and retrospectives.",
+  "keywords": [
+    "pi-package",
+    "agent-skills",
+    "claude-code",
+    "pi"
+  ],
+  "author": {
+    "name": "Team Brilliant",
+    "url": "https://teambrilliant.ai"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/teambrilliant/tap-skills.git"
+  },
+  "files": [
+    "skills",
+    "README.md",
+    ".claude-plugin"
+  ],
+  "pi": {
+    "skills": [
+      "./skills"
+    ]
+  }
+}
