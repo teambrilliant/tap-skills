@@ -34,6 +34,7 @@ Or install directly from GitHub:
 | `/tap-skills:curate-product-context` | Install and maintain `.tap/product.md` — product vision, focus, bets, non-goals |
 | `/tap-skills:qa-smoke-catalog` | Explore a web app and build/update the `.tap/smoke-tests.md` release smoke-test catalog |
 | `/tap-skills:qa-smoke-run`   | Execute the smoke-test catalog in a browser and report only what's broken |
+| `/tap-skills:alignment-atlas` | Generate/maintain alignment-diagram atlases — flow-by-flow grids on one navigable surface (default `.tap/diagrams/atlas/`, or any target dir, e.g. per PARA area) |
 
 ## How they work together
 
@@ -76,6 +77,7 @@ Skills read and write to `.tap/` in the target repo:
   product.md        ← durable product context: what we build, focus, bets, non-goals
   smoke-tests.md    ← release smoke-test catalog
   qa-runs/          ← smoke-run failure artifacts (only written when a run fails)
+  diagrams/atlas/   ← alignment-diagram atlas (self-contained file:// viewer + per-flow map data; default location, can also live per-area, e.g. areas/<x>/diagrams/atlas/)
 ```
 
 ### `.tap/architecture.md` and the feature-flag system
