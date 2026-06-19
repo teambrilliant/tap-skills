@@ -1,0 +1,1023 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>__ATLAS_TITLE__</title>
+    <!-- __FONT_LINKS__  scaffold injects @fontsource <link> tags (or leaves system fonts) -->
+    <style>
+      /* ════════ ATLAS CONFIG — brand tokens (scaffold fills) ════════ */
+      :root {
+        --ink: #000;
+        --white: #fff;
+        --muted: #5b6470;
+        --line: #e6e8eb;
+        --line-soft: #f1f3f5;
+        --bg-soft: #f7f9fa;
+        --mot: #fbf3d6;
+        --mot-bd: #e0b83a;
+        --risk: #c0392b;
+        --risk-soft: #fdecea;
+        --accent: #1fa2ff;
+        --font-ui: "Figtree", sans-serif;
+        --font-body: "Inter", sans-serif;
+        font-size: 14px;
+      }
+      /* status-badge + layer-rail colors are injected at runtime from window.ATLAS (see initStyles) */
+
+      * {
+        box-sizing: border-box;
+      }
+      body {
+        margin: 0;
+        font-family: var(--font-body);
+        color: var(--ink);
+        background: var(--white);
+      }
+      h1,
+      h2,
+      .t-title,
+      .section-label,
+      .row-label,
+      thead .step-name,
+      .layer-rail span {
+        font-family: var(--font-ui);
+      }
+      header.top {
+        padding: 20px 26px 16px;
+        border-bottom: 1px solid var(--line);
+      }
+      header.top h1 {
+        margin: 0 0 3px;
+        font-size: 22px;
+        font-weight: 700;
+      }
+      header.top .meta {
+        color: var(--muted);
+        font-size: 12.5px;
+      }
+      header.top .meta code {
+        background: var(--bg-soft);
+        padding: 1px 5px;
+        border-radius: 4px;
+        font-size: 11px;
+      }
+      main {
+        padding: 22px 26px 40px;
+      }
+
+      /* shared bits */
+      .badge {
+        display: inline-block;
+        font-size: 10.5px;
+        font-weight: 600;
+        color: var(--ink);
+        padding: 1px 8px;
+        border-radius: 999px;
+        border: 1px solid;
+        white-space: nowrap;
+        margin: 1px 2px 1px 0;
+      }
+      .badge.opt {
+        background: var(--white);
+        border-color: var(--line);
+        font-style: italic;
+        font-weight: 500;
+      }
+      .mot {
+        background: var(--mot);
+        border: 1px solid var(--mot-bd);
+        border-radius: 6px;
+        padding: 6px 9px;
+        margin-top: 4px;
+        font-size: 12px;
+      }
+      .mot::before {
+        content: "★ ";
+        font-weight: 700;
+      }
+      .mot.big {
+        border-width: 2px;
+      }
+      .mot.big::before {
+        content: "★★ ";
+      }
+      .quote {
+        color: var(--muted);
+        font-style: italic;
+      }
+      .empty {
+        color: var(--line);
+      }
+      .risk-text {
+        color: var(--risk);
+      }
+      .risk-text::before {
+        content: "⚠ ";
+      }
+      code,
+      .mono {
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 11px;
+        background: var(--bg-soft);
+        padding: 1px 4px;
+        border-radius: 4px;
+      }
+      .arc-intro {
+        max-width: 880px;
+        color: var(--muted);
+        font-size: 13.5px;
+        margin: 0 0 22px;
+      }
+      .arc-intro strong {
+        color: var(--ink);
+      }
+      .crumb {
+        font-size: 12.5px;
+        margin-bottom: 14px;
+      }
+      .crumb a {
+        text-decoration: none;
+        color: var(--ink);
+        font-weight: 600;
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        padding: 4px 10px;
+      }
+      .crumb a:hover {
+        background: var(--bg-soft);
+      }
+      .map-head {
+        display: flex;
+        align-items: baseline;
+        gap: 14px;
+        flex-wrap: wrap;
+        margin-bottom: 4px;
+      }
+      .map-head h2 {
+        margin: 0;
+        font-size: 24px;
+        font-weight: 700;
+      }
+      .map-head .meta-line {
+        color: var(--muted);
+        font-size: 12.5px;
+      }
+      .panel-card {
+        border: 1px solid var(--line);
+        border-radius: 12px;
+        padding: 14px 16px;
+        font-size: 13px;
+        line-height: 1.5;
+        max-width: 680px;
+      }
+      .panel-card h4 {
+        margin: 0 0 10px;
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+      }
+      .accept-list {
+        margin: 0;
+        padding-left: 4px;
+        list-style: none;
+      }
+      .accept-list li {
+        margin: 6px 0;
+        padding-left: 22px;
+        position: relative;
+      }
+      .accept-list li::before {
+        content: "";
+        position: absolute;
+        left: 0;
+        top: 2px;
+        width: 13px;
+        height: 13px;
+        border: 1.5px solid var(--accent);
+        border-radius: 4px;
+      }
+      .accept-list li.optional::before {
+        border-color: var(--muted);
+        border-style: dashed;
+      }
+      .kv {
+        margin: 0;
+      }
+      .kv dt {
+        font-size: 9.5px;
+        font-weight: 700;
+        letter-spacing: 0.05em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-top: 7px;
+      }
+      .kv dt:first-child {
+        margin-top: 0;
+      }
+      .kv dd {
+        margin: 1px 0 0;
+        font-family: ui-monospace, Menlo, monospace;
+        font-size: 11px;
+        word-break: break-word;
+      }
+      .kv dd.todo {
+        color: var(--risk);
+        font-style: italic;
+      }
+
+      /* home */
+      .section-label {
+        font-size: 12px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin: 6px 0 10px;
+      }
+      .atlas-grid {
+        display: grid;
+        gap: 6px;
+        align-items: stretch;
+      }
+      .ag-corner {
+      }
+      .ag-axis {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        padding: 6px 8px;
+        border-bottom: 2px solid var(--ink);
+      }
+      .ag-rowhead {
+        font-size: 11px;
+        font-weight: 800;
+        letter-spacing: 0.12em;
+        text-transform: uppercase;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 8px;
+        border-radius: 8px;
+        background: var(--bg-soft);
+      }
+      .ag-cell {
+        border: 1px dashed var(--line);
+        border-radius: 10px;
+        min-height: 84px;
+        padding: 6px;
+        display: flex;
+        flex-direction: column;
+        gap: 6px;
+      }
+      .flow-tile {
+        border: 1px solid var(--line);
+        border-radius: 8px;
+        background: var(--white);
+        padding: 8px 10px;
+        cursor: pointer;
+        font-size: 12px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 4px 8px;
+        align-items: baseline;
+        transition:
+          border-color 0.12s,
+          box-shadow 0.12s;
+      }
+      .flow-tile:hover {
+        border-color: var(--accent);
+        box-shadow: 0 2px 8px rgba(31, 162, 255, 0.12);
+      }
+      .flow-tile .t-title {
+        font-weight: 700;
+      }
+      .flow-tile .t-sum {
+        font-size: 11px;
+        color: var(--muted);
+        width: 100%;
+      }
+      .flow-tile .state-dot {
+        width: 9px;
+        height: 9px;
+        border-radius: 50%;
+        flex: none;
+        align-self: center;
+      }
+      .flow-tile.mapped .state-dot {
+        background: var(--accent);
+      }
+      .flow-tile.partial .state-dot {
+        background: var(--mot-bd);
+      }
+      .flow-tile.stub {
+        border-style: dashed;
+        opacity: 0.85;
+      }
+      .flow-tile.stub .state-dot {
+        background: transparent;
+        border: 1.5px solid var(--muted);
+      }
+      .atlas-legend {
+        margin-top: 18px;
+        color: var(--muted);
+        font-size: 12px;
+      }
+      .strip {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 12px;
+        margin-top: 8px;
+      }
+      /* facet-matrix home */
+      .fmatrix {
+        border-collapse: collapse;
+        width: 100%;
+        max-width: 1100px;
+        margin-bottom: 30px;
+      }
+      .fmatrix th,
+      .fmatrix td {
+        border: 1px solid var(--line);
+        padding: 10px 12px;
+        vertical-align: top;
+        text-align: left;
+        font-size: 12.5px;
+      }
+      .fmatrix thead th {
+        font-size: 11px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        background: var(--bg-soft);
+      }
+      .fmatrix .rowhead {
+        font-weight: 700;
+        cursor: pointer;
+        min-width: 180px;
+      }
+      .fmatrix .rowhead:hover {
+        background: var(--bg-soft);
+      }
+      .fmatrix .rowhead .vsub {
+        display: block;
+        font-weight: 500;
+        color: var(--muted);
+        font-size: 11px;
+        margin-top: 2px;
+      }
+      .fmatrix td .fmt {
+        display: block;
+        margin-bottom: 5px;
+      }
+      .fmatrix td.empty-cell {
+        background: repeating-linear-gradient(
+          45deg,
+          var(--bg-soft) 0 6px,
+          var(--white) 6px 12px
+        );
+      }
+
+      /* grid view */
+      .controls {
+        position: sticky;
+        top: 0;
+        z-index: 30;
+        background: var(--white);
+        border-bottom: 1px solid var(--line);
+        padding: 10px 26px;
+        margin: 0 -26px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 16px;
+        align-items: center;
+        font-size: 12px;
+      }
+      .controls .group {
+        display: flex;
+        gap: 6px;
+        align-items: center;
+        flex-wrap: wrap;
+      }
+      .controls .group-label {
+        color: var(--muted);
+        font-weight: 600;
+        text-transform: uppercase;
+        font-size: 10px;
+        letter-spacing: 0.04em;
+      }
+      .chip {
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 2px 10px;
+        cursor: pointer;
+        user-select: none;
+        background: var(--white);
+        font-size: 12px;
+        line-height: 18px;
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+      }
+      .chip .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 50%;
+        display: inline-block;
+        border: 1px solid rgba(0, 0, 0, 0.15);
+      }
+      .chip.off {
+        opacity: 0.35;
+      }
+      .chip:hover {
+        background: var(--bg-soft);
+      }
+      .chip[data-status] {
+        border: none;
+        padding: 0;
+        background: none;
+      }
+      .chip[data-status] .badge {
+        font-size: 12px;
+        line-height: 18px;
+        padding: 2px 10px;
+        margin: 0;
+        cursor: pointer;
+      }
+      .goal-banner {
+        margin: 12px 0 4px;
+        padding: 8px 13px;
+        border: 1px solid var(--line);
+        border-left: 3px solid var(--ink);
+        border-radius: 6px;
+        background: var(--bg-soft);
+        font-size: 12.5px;
+        line-height: 1.45;
+      }
+      .goal-banner .lbl {
+        font-weight: 800;
+        text-transform: uppercase;
+        letter-spacing: 0.07em;
+        font-size: 10px;
+        margin-right: 6px;
+      }
+      .goal-banner .kind {
+        font-weight: 700;
+        text-transform: uppercase;
+        letter-spacing: 0.05em;
+        font-size: 9.5px;
+        border: 1px solid var(--line);
+        border-radius: 999px;
+        padding: 1px 7px;
+        margin-right: 8px;
+        background: var(--white);
+      }
+      .map {
+        overflow: visible;
+        margin: 0 -26px;
+        padding: 0 26px;
+      }
+      table.grid {
+        border-collapse: collapse;
+        min-width: 1700px;
+        width: 100%;
+      }
+      table.grid th,
+      table.grid td {
+        border: 1px solid var(--line-soft);
+        padding: 9px 11px;
+        vertical-align: top;
+        text-align: left;
+        font-size: 12.5px;
+        line-height: 1.45;
+      }
+      table.grid thead th {
+        position: sticky;
+        top: 47px;
+        z-index: 20;
+        background: var(--white);
+        border-bottom: 2px solid var(--ink);
+        font-size: 12px;
+      }
+      thead .step-num {
+        color: var(--muted);
+        font-weight: 400;
+        font-size: 10.5px;
+        display: block;
+      }
+      thead .step-name {
+        font-weight: 700;
+        font-size: 13px;
+      }
+      thead .step-tag {
+        font-weight: 400;
+        color: var(--muted);
+        display: block;
+        margin-top: 2px;
+      }
+      .row-label {
+        position: sticky;
+        left: 42px;
+        z-index: 10;
+        background: var(--white);
+        font-weight: 600;
+        font-size: 11.5px;
+        min-width: 140px;
+        max-width: 140px;
+        border-right: 2px solid var(--line);
+      }
+      .row-label .sub {
+        display: block;
+        font-weight: 400;
+        color: var(--muted);
+        font-size: 10.5px;
+        margin-top: 2px;
+      }
+      table.grid td.layer-rail {
+        position: sticky;
+        left: 0;
+        z-index: 11;
+        width: 42px;
+        min-width: 42px;
+        max-width: 42px;
+        text-align: center;
+        vertical-align: middle;
+        padding: 8px 4px;
+        border-top: 2px solid var(--ink);
+        background: #fff;
+      }
+      .layer-rail span {
+        writing-mode: vertical-rl;
+        transform: rotate(180deg);
+        display: inline-block;
+        font-weight: 800;
+        font-size: 13px;
+        letter-spacing: 0.18em;
+        text-transform: uppercase;
+        white-space: nowrap;
+      }
+      .rail-corner {
+        position: sticky;
+        left: 0;
+        z-index: 21;
+        background: var(--white);
+        width: 42px;
+        min-width: 42px;
+        max-width: 42px;
+      }
+      tr.layer-start > td {
+        border-top: 2px solid var(--ink);
+      }
+      .line-of-visibility td {
+        background: repeating-linear-gradient(
+            90deg,
+            #9ca3af 0 12px,
+            transparent 12px 22px
+          )
+          center / 100% 2px no-repeat;
+        height: 8px;
+        padding: 0;
+        border: none;
+      }
+      .line-of-visibility .label-cell {
+        background: var(--white);
+        color: var(--muted);
+        font-size: 10px;
+        font-weight: 700;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        padding: 3px 11px;
+        border: none;
+        white-space: nowrap;
+      }
+      tr.hidden-layer {
+        display: none;
+      }
+      body.filter-active td .badge {
+        opacity: 0.25;
+      }
+      body.filter-active td .badge.flt-on {
+        opacity: 1;
+      }
+      body.filter-active .col-dim {
+        opacity: 0.25;
+      }
+      body.mot-only td > *:not(.mot) {
+        opacity: 0.25;
+      }
+      body.mot-only td .mot {
+        opacity: 1;
+      }
+      footer {
+        padding: 14px 26px 28px;
+        color: var(--muted);
+        font-size: 11.5px;
+        border-top: 1px solid var(--line);
+      }
+      .hidden {
+        display: none;
+      }
+    </style>
+  </head>
+  <body>
+    <header class="top">
+      <h1>__ATLAS_TITLE__</h1>
+      <div class="meta">__ATLAS_META__ · <strong>atlas v1.0</strong></div>
+    </header>
+
+    <main>
+      <div id="view-home"></div>
+      <div id="view-map" class="hidden"></div>
+    </main>
+
+    <footer>
+      <div>
+        ● mapped · ◐ partial · ○ stub · ★ moment of truth · ★★ make-or-break
+        moment · maps are data files in <code>maps/</code> — the shell renders
+        whatever registers
+      </div>
+    </footer>
+
+    <script>
+      /* ════════ ATLAS CONFIG — scaffold fills this object; the engine below is generic ════════ */
+      window.ATLAS = {
+        title: "__ATLAS_TITLE__",
+        registry: "Atlas", // window.<registry>; map files call window.<registry>.register(...)
+        home: {
+          type: "coverage", // "coverage" (tiles in rowAxis×colAxis cells) | "facet" (one map per row, columns = facets)
+          rowAxis: {
+            label: "Persona",
+            values: [
+              { id: "corporate", label: "Corporate" },
+              { id: "partner", label: "Partner" },
+            ],
+          },
+          colAxis: {
+            label: "Stage",
+            values: [
+              { id: "sell", label: "Sell" },
+              { id: "onboard", label: "Onboard" },
+              { id: "operate", label: "Operate" },
+              { id: "grow", label: "Grow" },
+            ],
+          },
+          facets: [], // "facet" home only: columns, e.g. [{id:"youtube",label:"YouTube"}]
+          stripLabel: "System maps · not lifecycle flows",
+          intro:
+            "Every flow on one surface. Rows are users; columns are the lifecycle. Empty cells are unmapped territory, shown on purpose.",
+        },
+        /* layer presets keyed by map type. A simple atlas needs one. */
+        layers: {
+          narrative: [
+            {
+              id: "customer",
+              label: "Customer",
+              cls: "customer",
+              color: "#1C64F2",
+              soft: "#EBF5FF",
+              rows: [
+                { k: "doing", label: "Doing" },
+                { k: "thinking", label: "Thinking / feeling", kind: "quote" },
+                { k: "mot", label: "Moment of truth", kind: "mot" },
+              ],
+            },
+            {
+              id: "org",
+              label: "Org",
+              cls: "org",
+              color: "#047481",
+              soft: "#D5F5F6",
+              rows: [
+                { k: "backstage", label: "Backstage", sub: "systems & data" },
+                { k: "status", label: "Status", kind: "status" },
+                {
+                  k: "acceptance",
+                  label: "Acceptance",
+                  sub: "criteria",
+                  kind: "acceptance",
+                },
+              ],
+            },
+          ],
+        },
+        lovDefault: "customer", // line of visibility drawn after this layer unless a map overrides via lovAfter
+        /* status vocabulary — label + fill + border. Drives badges AND the status filter chips. */
+        status: {
+          works: { label: "works", fill: "#DEF7EC", border: "#57c98a" },
+          wire: { label: "to wire", fill: "#FEECDC", border: "#ff8a3d" },
+          stub: { label: "stub", fill: "#F1F3F5", border: "#C7CDD3" },
+          live: { label: "live", fill: "#E1EFFE", border: "#5aa2f0" },
+        },
+      };
+
+      /* ════════ runtime style injection (status badges + layer rails from config) ════════ */
+      function initStyles() {
+        const css = [];
+        Object.entries(ATLAS.status).forEach(([k, s]) =>
+          css.push(
+            `.badge.${k}{background:${s.fill};border-color:${s.border};}`,
+          ),
+        );
+        allLayers().forEach(
+          (b) =>
+            b.cls &&
+            css.push(
+              `.layer-rail.${b.cls}{background:${b.soft || "var(--bg-soft)"};color:${b.color || "var(--ink)"};}`,
+            ),
+        );
+        const el = document.createElement("style");
+        el.textContent = css.join("\n");
+        document.head.appendChild(el);
+      }
+
+      /* ════════ registry ════════ */
+      window[ATLAS.registry] = {
+        maps: [],
+        register(m) {
+          this.maps.push(m);
+        },
+      };
+      const REG = () => window[ATLAS.registry].maps;
+
+      /* ════════ helpers ════════ */
+      const dash = `<span class="empty">—</span>`;
+      const badge = (s) =>
+        `<span class="badge ${s.k}" data-status="${s.k}">${s.t || (ATLAS.status[s.k] && ATLAS.status[s.k].label) || s.k}</span>`;
+      const motBox = (m) =>
+        m
+          ? `<div class="mot${m.level === 2 ? " big" : ""}">${m.text}</div>`
+          : "";
+      const mapById = (id) => REG().find((x) => x.id === id);
+      const layersFor = (m) =>
+        ATLAS.layers[m.type] || ATLAS.layers[Object.keys(ATLAS.layers)[0]];
+      const allLayers = () => Object.values(ATLAS.layers).flat();
+      const goalBanner = (m) =>
+        m.goal
+          ? `<div class="goal-banner"><span class="lbl">Goal</span><span class="kind">${m.goal.kind}</span>${m.goal.text}</div>`
+          : "";
+
+      /* ════════ cell value rendering — CLOSED set of six kinds ════════ */
+      function renderCellValue(val, kind) {
+        if (val == null || val === "" || val === false) return dash; // falsy guard — never leak "false"/"undefined"
+        switch (kind) {
+          case "quote":
+            return `<span class="quote">${val}</span>`;
+          case "mot":
+            return motBox(val);
+          case "status":
+            return (val || []).map(badge).join(" ") || dash;
+          case "acceptance":
+            return `<ul class="accept-list">${val
+              .map((a) =>
+                typeof a === "string"
+                  ? `<li>${a}</li>`
+                  : `<li class="optional">${a.text} <span class="badge opt">optional</span></li>`,
+              )
+              .join("")}</ul>`;
+          case "kv":
+            return `<dl class="kv">${val.map((d) => `<dt>${d.k}</dt><dd${d.todo ? ' class="todo"' : ""}>${d.v}</dd>`).join("")}</dl>`;
+          default:
+            return val; // "html" — trusted local HTML (<code>, <em>, <strong>, <span class="risk-text">)
+        }
+      }
+
+      /* ════════ home ════════ */
+      function renderHome(el) {
+        ATLAS.home.type === "facet"
+          ? renderHomeFacet(el)
+          : renderHomeCoverage(el);
+      }
+
+      const tile = (
+        m,
+      ) => `<div class="flow-tile ${m.status}" onclick="location.hash='#/map/${m.id}'">
+	<span class="state-dot"></span><span class="t-title">${m.title}</span><span class="t-sum">${m.summary || ""}</span></div>`;
+
+      function renderHomeCoverage(el) {
+        const H = ATLAS.home,
+          placed = (m) => m.cell && m.cell.rows && m.cell.cols;
+        const grid = `
+		<div class="atlas-grid" style="grid-template-columns:120px repeat(${H.colAxis.values.length},1fr)">
+			<div class="ag-corner"></div>
+			${H.colAxis.values.map((c) => `<div class="ag-axis">${c.label}</div>`).join("")}
+			${H.rowAxis.values
+        .map(
+          (r) => `
+				<div class="ag-rowhead">${r.label}</div>
+				${H.colAxis.values
+          .map(
+            (c) => `<div class="ag-cell">
+					${REG()
+            .filter(
+              (m) =>
+                placed(m) &&
+                m.cell.rows.includes(r.id) &&
+                m.cell.cols.includes(c.id),
+            )
+            .map(tile)
+            .join("")}
+				</div>`,
+          )
+          .join("")}`,
+        )
+        .join("")}
+		</div>`;
+        el.innerHTML = `<p class="arc-intro">${H.intro || ""}</p>${grid}${strip((m) => !placed(m))}
+		<p class="atlas-legend">An empty cell means nobody has named that flow yet. Add one: drop a file in <code>maps/</code> + one <code>&lt;script src&gt;</code> line.</p>`;
+      }
+
+      function renderHomeFacet(el) {
+        const H = ATLAS.home,
+          isRow = (m) => m.row && m.facets;
+        const cell = (c) =>
+          !c
+            ? `<td class="empty-cell">${dash}</td>`
+            : `<td><span class="fmt">${c.fmt}</span>${c.status ? badge({ k: c.status }) : ""}</td>`;
+        const rows = REG()
+          .filter(isRow)
+          .map(
+            (m) => `<tr>
+		<td class="rowhead" onclick="location.hash='#/map/${m.id}'">${m.row.label}${m.row.sub ? `<span class="vsub">${m.row.sub}</span>` : ""}</td>
+		${H.facets.map((f) => cell(m.facets[f.id])).join("")}</tr>`,
+          )
+          .join("");
+        el.innerHTML = `<p class="arc-intro">${H.intro || ""}</p>
+		<table class="fmatrix"><thead><tr><th>${H.rowAxis.label}</th>${H.facets.map((f) => `<th>${f.label}</th>`).join("")}</tr></thead>
+		<tbody>${rows}</tbody></table>${strip((m) => !isRow(m))}`;
+      }
+
+      function strip(pred) {
+        const items = REG().filter(pred);
+        if (!items.length) return "";
+        return `<div class="section-label" style="margin-top:26px">${ATLAS.home.stripLabel}</div>
+		<div class="strip">${items.map(tile).join("")}</div>`;
+      }
+
+      /* ════════ stub page ════════ */
+      function renderStub(el, m) {
+        const cov = m.coveredBy
+          ? `<p class="arc-intro">Partially covered today by
+		<a href="#/map/${m.coveredBy.map}">${(mapById(m.coveredBy.map) || { title: m.coveredBy.map }).title}</a> — ${m.coveredBy.note}</p>`
+          : "";
+        el.innerHTML = `
+		<div class="crumb"><a href="#/">← Atlas</a></div>
+		<div class="map-head"><h2>${m.title}</h2><span class="badge stub">not yet mapped</span><span class="meta-line">updated ${m.updated}</span></div>
+		${goalBanner(m)}<p class="arc-intro">${m.summary || ""}</p>${cov}
+		<div class="panel-card"><h4>Mapping this would answer</h4>
+			<ul class="accept-list">${(m.wouldAnswer || []).map((q) => `<li>${q}</li>`).join("")}</ul></div>`;
+      }
+
+      /* ════════ the grid (the one map view) ════════ */
+      function renderGrid(el, m) {
+        const B = m.steps,
+          N = B.length,
+          layers = layersFor(m),
+          lovAfter = m.lovAfter || ATLAS.lovDefault;
+        const headRow = `<tr><th class="rail-corner"></th><th class="row-label"></th>${B.map(
+          (b) =>
+            `<th><span class="step-num">${m.stepWord || "STEP"} ${b.num}</span><span class="step-name">${b.title}</span>${b.tag ? `<span class="step-tag">${b.tag}</span>` : ""}</th>`,
+        ).join("")}</tr>`;
+        const lov = `<tr class="line-of-visibility"><td class="label-cell" colspan="2">line of visibility</td><td colspan="${N}"></td></tr>`;
+
+        let body = "";
+        layers.forEach((layer) => {
+          layer.rows.forEach((r, ri) => {
+            const tds = B.map(
+              (b) =>
+                `<td>${renderCellValue(b.cells && b.cells[layer.id] ? b.cells[layer.id][r.k] : undefined, r.kind)}</td>`,
+            ).join("");
+            const rail =
+              ri === 0
+                ? `<td class="layer-rail ${layer.cls || ""}" rowspan="${layer.rows.length}"><span>${layer.label}</span></td>`
+                : "";
+            body += `<tr class="layer-row${ri === 0 ? " layer-start" : ""}" data-layer="${layer.id}">${rail}<td class="row-label">${r.label}${r.sub ? `<span class="sub">${r.sub}</span>` : ""}</td>${tds}</tr>`;
+          });
+          if (lovAfter === layer.id) body += lov;
+        });
+
+        const present = new Set();
+        B.forEach((b) =>
+          layers.forEach((bd) =>
+            (
+              (b.cells && b.cells[bd.id] && b.cells[bd.id].status) ||
+              []
+            ).forEach((s) => present.add(s.k)),
+          ),
+        );
+        const statusChips = Object.keys(ATLAS.status)
+          .filter((k) => present.has(k))
+          .map(
+            (k) =>
+              `<span class="chip" data-status="${k}"><span class="badge ${k}">${ATLAS.status[k].label}</span></span>`,
+          )
+          .join("");
+
+        el.innerHTML = `
+		<div class="crumb"><a href="#/">← Atlas</a></div>
+		<div class="map-head"><h2>${m.title}</h2><span class="meta-line">updated ${m.updated}${m.source ? ` · source: <code>${m.source}</code>` : ""}</span></div>
+		${goalBanner(m)}
+		<div class="controls">
+			<div class="group"><span class="group-label">Layers</span>
+				${layers.map((b) => `<span class="chip" data-layer="${b.id}"><span class="dot" style="background:${b.color || "var(--muted)"}"></span>${b.label}</span>`).join("")}</div>
+			<div class="group"><span class="group-label">Status</span>${statusChips}</div>
+			<div class="group"><span class="group-label">Focus</span><span class="chip" id="motToggle">★ moments only</span></div>
+		</div>
+		<div class="map"><table class="grid"><thead>${headRow}</thead><tbody>${body}</tbody></table></div>`;
+        wireGridControls(el, N);
+      }
+
+      function wireGridControls(root, stepCount) {
+        root.querySelectorAll(".chip[data-layer]").forEach((chip) =>
+          chip.addEventListener("click", () => {
+            chip.classList.toggle("off");
+            const show = !chip.classList.contains("off");
+            root
+              .querySelectorAll(`tr[data-layer="${chip.dataset.layer}"]`)
+              .forEach((r) => r.classList.toggle("hidden-layer", !show));
+          }),
+        );
+        const statusChips = root.querySelectorAll(".chip[data-status]");
+        const stepCells = (r) => [...r.cells].slice(-stepCount);
+        let active;
+        statusChips.forEach((chip) =>
+          chip.addEventListener("click", () => {
+            const status = chip.dataset.status,
+              off = active === status;
+            active = off ? undefined : status;
+            statusChips.forEach((c) =>
+              c.classList.toggle("off", !off && c !== chip),
+            );
+            document.body.classList.toggle("filter-active", !off);
+            root
+              .querySelectorAll("td .badge")
+              .forEach((b) =>
+                b.classList.toggle(
+                  "flt-on",
+                  !off && b.dataset.status === status,
+                ),
+              );
+            root
+              .querySelectorAll(".col-dim")
+              .forEach((c) => c.classList.remove("col-dim"));
+            if (off) return;
+            const lit = new Set();
+            root
+              .querySelectorAll(`tbody td .badge[data-status="${status}"]`)
+              .forEach((b) => {
+                const idx = stepCells(b.closest("tr")).indexOf(b.closest("td"));
+                if (idx >= 0) lit.add(idx);
+              });
+            [
+              root.querySelector("thead tr"),
+              ...root.querySelectorAll("tbody tr:not(.line-of-visibility)"),
+            ].forEach((r) =>
+              stepCells(r).forEach((c, i) => {
+                if (!lit.has(i)) c.classList.add("col-dim");
+              }),
+            );
+          }),
+        );
+        root.querySelector("#motToggle").addEventListener("click", (e) => {
+          e.target.classList.toggle("off");
+          document.body.classList.toggle("mot-only");
+        });
+      }
+
+      /* ════════ router ════════ */
+      function route() {
+        const seg = (location.hash || "#/").slice(2).split("/").filter(Boolean);
+        const home = document.getElementById("view-home"),
+          mapEl = document.getElementById("view-map");
+        if (seg[0] !== "map") {
+          renderHome(home);
+          home.classList.remove("hidden");
+          mapEl.classList.add("hidden");
+        } else {
+          const m = mapById(seg[1]);
+          if (!m) {
+            location.hash = "#/";
+            return;
+          }
+          if (m.steps && m.steps.length) renderGrid(mapEl, m);
+          else renderStub(mapEl, m);
+          mapEl.classList.remove("hidden");
+          home.classList.add("hidden");
+        }
+        document.body.classList.remove("filter-active", "mot-only");
+        window.scrollTo(0, 0);
+      }
+      window.addEventListener("hashchange", route);
+      window.addEventListener("DOMContentLoaded", () => {
+        initStyles();
+        route();
+      });
+    </script>
+
+    <!-- ════════ map registrations — scaffold adds one <script src> line per map ════════ -->
+    <script src="maps/example.js"></script>
+  </body>
+</html>
