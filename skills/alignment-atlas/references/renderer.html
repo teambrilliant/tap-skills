@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>__ATLAS_TITLE__</title>
+    <title>Atlas</title>
     <!-- __FONT_LINKS__  scaffold injects @fontsource <link> tags (or leaves system fonts) -->
     <style>
       /* ════════ ATLAS CONFIG — brand tokens (scaffold fills) ════════ */
@@ -328,7 +328,7 @@
       }
       .strip {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        grid-template-columns: repeat(auto-fill, minmax(260px, 320px));
         gap: 12px;
         margin-top: 8px;
       }
@@ -625,8 +625,8 @@
   </head>
   <body>
     <header class="top">
-      <h1>__ATLAS_TITLE__</h1>
-      <div class="meta">__ATLAS_META__ · <strong>atlas v1.0</strong></div>
+      <h1></h1>
+      <div class="meta" id="atlas-meta"></div>
     </header>
 
     <main>
@@ -703,6 +703,22 @@
               ],
             },
           ],
+          /* non-flow reference preset — premise content (what's sold, the terms), not a sequence. Maps of type:"offer" use lov:false + stepWord:"RUNG" and live off-grid (no cell → strip). */
+          offer: [
+            {
+              id: "offer",
+              label: "Offer",
+              cls: "offer",
+              color: "#9333EA",
+              soft: "#F3E8FF",
+              rows: [
+                { k: "get", label: "What you get" },
+                { k: "pay", label: "What you pay" },
+                { k: "risk", label: "Risk reversal" },
+                { k: "proof", label: "Proof" },
+              ],
+            },
+          ],
         },
         lovDefault: "customer", // line of visibility drawn after this layer unless a map overrides via lovAfter
         /* status vocabulary — label + fill + border. Drives badges AND the status filter chips. */
@@ -732,6 +748,35 @@
         const el = document.createElement("style");
         el.textContent = css.join("\n");
         document.head.appendChild(el);
+      }
+
+      /* ════════ runtime header (no scaffold placeholders to forget) ════════ */
+      function renderHeader() {
+        document.title = ATLAS.title || "Atlas";
+        const h1 = document.querySelector("header.top h1");
+        if (h1) h1.textContent = ATLAS.title || "Atlas";
+        const meta = document.getElementById("atlas-meta");
+        if (meta) {
+          const maps = REG();
+          const mapped = maps.filter((m) => m.steps && m.steps.length).length;
+          const parts = [];
+          if (ATLAS.updated) parts.push(`updated ${ATLAS.updated}`);
+          parts.push(`${maps.length} map${maps.length === 1 ? "" : "s"}`);
+          if (mapped) parts.push(`${mapped} mapped`);
+          meta.innerHTML = `${parts.join(" · ")} · <strong>atlas v1.0</strong>`;
+        }
+      }
+
+      /* ════════ author-mistake guard: a map placed in >1 cell duplicates (no colspan) ════════ */
+      function warnDuplicateCells() {
+        REG().forEach((m) => {
+          if (!m.cell) return;
+          const n = (m.cell.rows || []).length * (m.cell.cols || []).length;
+          if (n > 1)
+            console.warn(
+              `[atlas] map "${m.id}" occupies ${n} home cells — the tile renders once per cell (no colspan). Use one row + one col for a single placement.`,
+            );
+        });
       }
 
       /* ════════ registry ════════ */
@@ -826,7 +871,9 @@
         )
         .join("")}
 		</div>`;
-        el.innerHTML = `<p class="arc-intro">${H.intro || ""}</p>${grid}${strip((m) => !placed(m))}
+        const stripHtml = strip((m) => !placed(m));
+        const top = ATLAS.home.stripPosition === "top";
+        el.innerHTML = `<p class="arc-intro">${H.intro || ""}</p>${top ? stripHtml : ""}${grid}${top ? "" : stripHtml}
 		<p class="atlas-legend">An empty cell means nobody has named that flow yet. Add one: drop a file in <code>maps/</code> + one <code>&lt;script src&gt;</code> line.</p>`;
       }
 
@@ -853,8 +900,14 @@
       function strip(pred) {
         const items = REG().filter(pred);
         if (!items.length) return "";
-        return `<div class="section-label" style="margin-top:26px">${ATLAS.home.stripLabel}</div>
-		<div class="strip">${items.map(tile).join("")}</div>`;
+        const H = ATLAS.home;
+        const gridAlign = H.stripAlign === "grid" && H.type === "coverage";
+        const styleAttr = gridAlign
+          ? ` style="grid-template-columns:120px repeat(${H.colAxis.values.length},1fr);gap:6px"`
+          : "";
+        const spacer = gridAlign ? `<div></div>` : ""; // 120px rail spacer → cards align under columns
+        return `<div class="section-label" style="margin-top:26px">${H.stripLabel}</div>
+		<div class="strip"${styleAttr}>${spacer}${items.map(tile).join("")}</div>`;
       }
 
       /* ════════ stub page ════════ */
@@ -876,7 +929,8 @@
         const B = m.steps,
           N = B.length,
           layers = layersFor(m),
-          lovAfter = m.lovAfter || ATLAS.lovDefault;
+          lovAfter = m.lovAfter || ATLAS.lovDefault,
+          drawLov = m.lov !== false;
         const headRow = `<tr><th class="rail-corner"></th><th class="row-label"></th>${B.map(
           (b) =>
             `<th><span class="step-num">${m.stepWord || "STEP"} ${b.num}</span><span class="step-name">${b.title}</span>${b.tag ? `<span class="step-tag">${b.tag}</span>` : ""}</th>`,
@@ -896,7 +950,7 @@
                 : "";
             body += `<tr class="layer-row${ri === 0 ? " layer-start" : ""}" data-layer="${layer.id}">${rail}<td class="row-label">${r.label}${r.sub ? `<span class="sub">${r.sub}</span>` : ""}</td>${tds}</tr>`;
           });
-          if (lovAfter === layer.id) body += lov;
+          if (drawLov && lovAfter === layer.id) body += lov;
         });
 
         const present = new Set();
@@ -1013,6 +1067,8 @@
       window.addEventListener("hashchange", route);
       window.addEventListener("DOMContentLoaded", () => {
         initStyles();
+        renderHeader();
+        warnDuplicateCells();
         route();
       });
     </script>

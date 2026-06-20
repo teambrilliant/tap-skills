@@ -54,3 +54,48 @@ window.Atlas.register({
     },
   ],
 });
+
+/* Second example — a NON-FLOW "offer" map (premise, not a sequence). Uses the
+   `offer` layer preset (renderer.html → window.ATLAS.layers.offer): get/pay/risk/proof
+   rows, `lov:false` (no line of visibility — it's not a flow), `stepWord:"RUNG"`
+   (columns are tiers, not steps), and NO `cell` → falls to the home strip (off-grid).
+   Delete alongside the flow example once real maps exist. */
+window.Atlas.register({
+  id: "example-offer",
+  title: "Example offer",
+  type: "offer",
+  status: "mapped",
+  updated: "2026-06-20",
+  summary:
+    "A non-flow reference map — what's sold and on what terms — shown off-grid in the strip.",
+  lov: false,
+  stepWord: "RUNG",
+  steps: [
+    {
+      num: 1,
+      title: "Starter",
+      tag: "entry tier",
+      cells: {
+        offer: {
+          get: "The core thing the buyer gets at this tier.",
+          pay: "The price / commitment for this tier.",
+          risk: "What de-risks the purchase (guarantee, trial).",
+          proof: "Evidence it works (a result, a name, a number).",
+        },
+      },
+    },
+    {
+      num: 2,
+      title: "Pro",
+      tag: "upgrade tier",
+      cells: {
+        offer: {
+          get: "What the higher tier adds on top.",
+          pay: "The step-up price / commitment.",
+          risk: "How the higher commitment is de-risked.",
+          proof: "Evidence the upgrade pays off.",
+        },
+      },
+    },
+  ],
+});
