@@ -97,9 +97,10 @@ Show the new/changed file(s) (full content for a new map; unified diff for edits
 
 On `yes`: write the files (create `$ATLAS/` if needed). Then **verify in a browser** (Chrome DevTools MCP preferred; manual fallback otherwise):
 
-- Open `file://…/index.html`; **hard-reload** (`file://` caches).
+- Open `file://…/index.html`. **After any edit, force a FULL document reload** — DevTools `navigate {type:"reload", ignoreCache:true}`, or Cmd-Shift-R. ⚠️ A hash change alone (`#/` ↔ `#/map/x`) does **not** re-fetch `index.html`, so edits to the renderer or maps won't appear (`file://` + in-page routing). This is the #1 "why isn't my change showing" trap.
 - Home renders; the new/changed tile lands in the right cell; `#/map/<id>` renders the grid.
 - `list_console_messages` → zero errors.
+- `grep -o '__[A-Z_]*__' index.html` → **no matches** (no unfilled scaffold placeholders shipped).
 - Grep the rendered grid for literal `false` / `undefined` / `[object Object]` — none (the documented falsy-leak footgun).
   Report what rendered. On `edit`: loop to step 4. On `cancel`: write nothing.
 
@@ -121,6 +122,8 @@ window.<Registry>.register({
 })
 ```
 
+> **`cell.rows`/`cols` are the EXACT cells the tile occupies — not a span.** Listing N columns renders the SAME card in each of the N cells (there is no colspan). For a single, clean placement use **one** row and **one** col. (Multi-cell "bands" duplicate the card and read as a bug.)
+
 Cell value by kind: `html`=string · `quote`=string · `mot`={level,text} · `status`=[{k}] · `acceptance`=string[]|{text,optional}[] · `kv`=[{k,v,todo}].
 
 ## Handoffs
@@ -131,8 +134,22 @@ Cell value by kind: `html`=string · `quote`=string · `mot`={level,text} · `st
 
 ## Boundaries
 
-- Ships ONE view: the layers×steps grid. `journey` / `blueprint` / `mental-model` / system-map types are reserved, not implemented (render as stubs).
+- Ships ONE view per map: the layers×steps grid. `journey` / `blueprint` / `mental-model` / system-map types are reserved, not implemented (render as stubs). An atlas may host many maps of different `type`s (flow + non-flow reference grids); the home composes them (grid + strip).
 - Does NOT author `.tap/product.md`, `.tap/architecture.md`, or `thoughts/plans/`.
 - Does NOT invent a brand system — detects `.tap/design/*brand*` or uses the neutral default.
 - Does NOT overwrite any atlas file without showing the diff and getting confirmation.
+
+## Patterns
+
+### Cockpit layout (premise-first)
+
+The grid maps _flows_. For an operating surface you often also want **premise** — non-flow context (what's sold, the economics, who it's for, positioning). Don't grid-ify premise:
+
+- Give premise maps **no `cell`** → they fall to the strip (off-grid, still openable). Use a non-flow layer `type` (e.g. `offer` with rows get/pay/risk/proof, `lov:false`, `stepWord:"RUNG"`).
+- Surface the premise band at the **top**: `home.stripPosition:"top"` + `home.stripAlign:"grid"` (cards align under the columns). Carry headline context + links in `home.intro` (it renders HTML).
+- Result reads premise → motion (the flow grid) → meta. The grid stays pure flow-mapping.
+
+**Multiple layer presets per atlas are supported and encouraged** — `layers` is keyed by map `type`. A flow type (`customer`/`org` rows) and reference types (`offer`/`money`) can coexist; each map picks its `type`.
+
+> `stripPosition` / `stripAlign` apply to the **coverage** home only — they're silent no-ops in `facet` mode (the cockpit pattern is a coverage home).
 
