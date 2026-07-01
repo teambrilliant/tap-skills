@@ -1,0 +1,82 @@
+[
+  {
+    "query": "wrapping up — what should i update so next time you don't drop tests during the auth refactor we just did?",
+    "should_trigger": true
+  },
+  {
+    "query": "let's tighten the loop on today's session before i head out — i had to redirect you a bunch on the migration approach",
+    "should_trigger": true
+  },
+  {
+    "query": "i had to correct you like four times today on the orchestrator skill design. how can i make your life easier next time?",
+    "should_trigger": true
+  },
+  {
+    "query": "debrief this conversation please, what tripped you up?",
+    "should_trigger": true
+  },
+  {
+    "query": "before i close out — what slowed you down today, anything i should add to CLAUDE.md from the back-and-forth on the figma flow?",
+    "should_trigger": true
+  },
+  {
+    "query": "i keep having to remind you to use rg not grep across this whole session, what's the durable fix",
+    "should_trigger": true
+  },
+  {
+    "query": "this is the third time i've redirected you on the drizzle vs raw sql thing. what should we change so future sessions don't trip on the same stuff",
+    "should_trigger": true
+  },
+  {
+    "query": "given everything we just did with the dashboard rebuild, what would help an agent next time on similar work",
+    "should_trigger": true
+  },
+  {
+    "query": "okay we're done with the worker-queue migration. what corrections did i make today that should become project rules?",
+    "should_trigger": true
+  },
+  {
+    "query": "harvest the steers from this convo into actual durable rules in the repo",
+    "should_trigger": true
+  },
+  {
+    "query": "i just cloned this repo, what do i need to work autonomously here? are there manual workflows i should automate first?",
+    "should_trigger": false
+  },
+  {
+    "query": "what's manual in this codebase that should be automated — i'm starting on the analytics pipeline tomorrow and want loops closed",
+    "should_trigger": false
+  },
+  {
+    "query": "let's do a retro on the payments PR (#1247) that just merged last week — what blocked the agents on it?",
+    "should_trigger": false
+  },
+  {
+    "query": "post-mortem on yesterday's incident with the kafka worker dropping messages, want a writeup in .tap/learnings.md",
+    "should_trigger": false
+  },
+  {
+    "query": "what did we learn from the Q4 dashboard release? need this for the board deck next week",
+    "should_trigger": false
+  },
+  {
+    "query": "add a rule to CLAUDE.md that says all integration tests must hit a real postgres, not mocks — we got burned last quarter",
+    "should_trigger": false
+  },
+  {
+    "query": "you forgot to add tests for the auth handler in apps/api/src/auth/handler.ts, please add them now",
+    "should_trigger": false
+  },
+  {
+    "query": "create a skill that takes a figma url and generates react components matching our design system tokens",
+    "should_trigger": false
+  },
+  {
+    "query": "how do i make my coding agents more reliable across all my projects in general? looking for high-level advice",
+    "should_trigger": false
+  },
+  {
+    "query": "review the changes in my last 3 commits and tell me what's risky before i merge to main",
+    "should_trigger": false
+  }
+]

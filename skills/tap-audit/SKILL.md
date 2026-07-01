@@ -146,47 +146,13 @@ Specific design smells found flow into Approach Gaps as actionable items.
 
 #### Feedback Loops
 
-Discover the **top 3 workflows** in this repo — both automated and manual. Don't just check infrastructure (tests, CI, docs). The most valuable finding is a workflow humans do by hand that an agent could own.
+Assess the repo's **top 3 workflows** using the five-element loop model — Generator / Legibility / Evaluator / Handoff / Grading — that `/tap-skills:loop-check` owns. The most valuable finding is a workflow humans do by hand that an agent could own.
 
-**Active discovery — run these scans:**
+`loop-check` is the single source of truth for the discovery scans and the rubric. For an audit, either:
+- **Run `/tap-skills:loop-check`** and fold its findings into this section, or
+- Apply its model directly: discover workflows (binary assets without generators, git-churn iteration loops, human-in-the-loop scripts, prose pipelines in docs), rate each **Closed / Open / No loop / Manual**, and prescribe a concrete fix — a specific skill, MCP, hook, CLI tool, or test. "Add browser tests" is too vague; name the thing to build.
 
-1. **Binary assets without generators** — scan for committed images, fonts, audio, video, PDFs. Check if corresponding generation scripts, Makefiles, or asset pipelines exist. If PNGs exist but no script produces them → manual workflow.
-   ```
-   Find: *.png, *.jpg, *.svg, *.gif, *.mp3, *.wav, *.pdf, *.ttf, *.otf
-   Then: look for Makefile, generate-*.sh, scripts/, asset pipeline, or build step that produces them
-   Missing generator = manual creation workflow
-   ```
-
-2. **Git history patterns** — files that get re-committed with small changes repeatedly suggest a manual iteration loop (human tweaks, checks, tweaks again). Look for binary files or config files with 5+ commits.
-   ```
-   git log --all --diff-filter=M --name-only --pretty=format: | sort | uniq -c | sort -rn | head -20
-   ```
-   Files with high re-commit counts without associated test/script changes = manual iteration.
-
-3. **Human-in-the-loop scripts** — scan shell scripts and docs for steps that require visual inspection, manual input, or judgment. Look for:
-   - Scripts that open a window/browser and wait for human to look
-   - README/CLAUDE.md steps phrased as "then you...", "manually...", "visually check...", "inspect the output"
-   - Scripts with `read`, `open`, `sleep` (waiting for human), or comments like "# check this looks right"
-
-4. **Workflow descriptions in docs** — read CLAUDE.md, README, and any contributing guides. Any multi-step process described in prose is a candidate for automation. Pay special attention to sequences like "first run X, then check Y, then run Z" — that's an unautomated pipeline.
-
-For each workflow, assess:
-
-| Element | What to look for |
-|---------|-----------------|
-| **Generator** | Can an agent produce the output? If not, what's missing — a skill, an MCP, a CLI tool, an API? |
-| **Evaluator** | Can something *other than the generator* verify the output? (tests, lint, visual regression, Playwright, type checker) |
-| **Handoff** | Can the agent context-reset and resume? (shaped docs, plans, `.tap/` memory, clear commit history) |
-| **Grading criteria** | Are quality expectations measurable, not vibes? (test suites, lint rules, acceptance criteria, design specs) |
-
-Rate each workflow:
-
-- **Closed loop** — all four elements present. Agent can iterate autonomously.
-- **Open loop** — evaluator or grading criteria missing. Agent produces output but can't verify quality — human must inspect.
-- **No loop** — no evaluator, no criteria. Agent guesses and hopes.
-- **Manual** — human does this entirely by hand. No agent involvement yet.
-
-For each non-closed workflow, prescribe a concrete automation path: a specific skill to create, MCP to wire up, hook to add, CLI tool to integrate, or external service to connect. Be specific — "add browser tests" is too vague; "create a sprite-generation skill that uses nano-banana-pro MCP to generate pixel art PNGs, renders them in-app via dev-check.sh, and validates dimensions/palette" is actionable.
+Do not re-derive the rubric here — keeping it in one place is what stops the two skills from drifting.
 
 #### Approach Gaps
 

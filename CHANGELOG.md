@@ -2,6 +2,19 @@
 
 All notable changes to this package are documented here. Versions follow [Semantic Versioning](https://semver.org/).
 
+## [0.11.0]
+
+### Adopted the two harness meta-skills from dev-skills
+
+`loop-check` and `tighten-loop` now live here, completing the assess×learn / full×focused quadrant with `tap-audit` and `retrospective`. Invoke as `/tap-skills:loop-check` and `/tap-skills:tighten-loop`.
+
+**Added**
+- `loop-check` — focused feedback-loop assessment for a single workflow (sibling of `tap-audit`). New **Legibility** element (can the agent perceive the running system — UI, logs, metrics?), plus raised bars: Evaluator must return agent-legible remediation, Grading must be mechanically enforced. Distilled from OpenAI's *Harness Engineering*.
+- `tighten-loop` — in-session debrief that harvests course-corrections into durable fixes (sibling of `retrospective`). Now also harvests **agent-struggle** signals, escalates repeat steers from documentation to mechanical enforcement, and keeps context fixes map-not-manual.
+
+**Changed**
+- `tap-audit`'s Feedback Loops section now delegates to `loop-check` (single source of truth) instead of duplicating the rubric.
+
 ## [0.10.0]
 
 ### alignment-atlas — hardening + opt-in cockpit layout

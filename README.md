@@ -27,9 +27,11 @@ Or install directly from GitHub:
 | Skill                        | What it does                                                |
 | ---------------------------- | ----------------------------------------------------------- |
 | `/tap-skills:tap-audit`      | Assess how ready a repo is for autonomous agent work; seeds `.tap/architecture.md` (incl. feature-flag system) |
+| `/tap-skills:loop-check`     | Assess what's needed to make one workflow's feedback loop autonomous — focused sibling of tap-audit |
 | `/tap-skills:blast-radius`   | Impact analysis of PR changes before merging                |
 | `/tap-skills:systems-health` | Measure dev system health via stocks, flows, feedback loops |
 | `/tap-skills:retrospective`  | Just-in-time retro focused on improving agent autonomy      |
+| `/tap-skills:tighten-loop`   | Harvest this session's course-corrections into durable, repo-portable fixes — in-session sibling of retrospective |
 | `/tap-skills:tech-roadmap`   | Build 12-month outcome-based tech roadmap for CEO/board     |
 | `/tap-skills:curate-product-context` | Install and maintain `.tap/product.md` — product vision, focus, bets, non-goals |
 | `/tap-skills:qa-smoke-catalog` | Explore a web app and build/update the `.tap/smoke-tests.md` release smoke-test catalog |
@@ -42,7 +44,8 @@ Or install directly from GitHub:
 Agent enters repo
       │
       ▼
-  /tap-audit ──────────► assess readiness, identify gaps
+  /tap-audit ──────────► assess whole-repo readiness, identify gaps
+  /loop-check ─────────► assess a single workflow's feedback loop (focused)
   /qa-smoke-catalog ───► build the release smoke-test catalog
       │
       ▼
@@ -61,8 +64,18 @@ Agent enters repo
   /systems-health ──► measure how the system is performing
       │
       ▼
-  /retrospective ──► what to improve so agents need less help next time
+  /retrospective ──► what to improve so agents need less help next time (event-driven)
+  /tighten-loop ───► same, harvested from the current session's steers (in-session)
 ```
+
+### The harness meta-skills
+
+Four skills read a repo or session and prescribe autonomy improvements, in the same Context/Harness/Feedback/Scope vocabulary:
+
+|              | Full repo        | Single loop / session |
+| ------------ | ---------------- | --------------------- |
+| **Assess**   | `tap-audit`      | `loop-check`          |
+| **Learn**    | `retrospective`  | `tighten-loop`        |
 
 ## Project memory
 
