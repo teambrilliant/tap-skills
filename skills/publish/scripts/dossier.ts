@@ -1,0 +1,238 @@
+import { execSync } from "node:child_process"
+import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs"
+import { homedir } from "node:os"
+import { basename, join, relative, resolve } from "node:path"
+
+const HOST = process.env["DOSSIER_HOST"] ?? "teambrilliant.dev"
+const TOKEN = process.env["DOSSIER_TOKEN"]
+const API = process.env["DOSSIER_API"] ?? `https://${HOST}/v1`
+const KEYS_DIR = join(homedir(), ".config", "dossier")
+const KEYS_PATH = join(KEYS_DIR, "keys.json")
+
+function isRecord(value: unknown): value is Record<string, unknown> {
+  return typeof value === "object" && value !== null && !Array.isArray(value)
+}
+
+function str(value: Record<string, unknown>, key: string): string | null {
+  const v = value[key]
+  return typeof v === "string" ? v : null
+}
+
+function loadKeys(): Record<string, string> {
+  if (!existsSync(KEYS_PATH)) return {}
+  const parsed: unknown = JSON.parse(readFileSync(KEYS_PATH, "utf8"))
+  if (!isRecord(parsed)) return {}
+  const out: Record<string, string> = {}
+  for (const [k, v] of Object.entries(parsed)) if (typeof v === "string") out[k] = v
+  return out
+}
+
+function saveKey(siteId: string, key: string): void {
+  const keys = loadKeys()
+  keys[siteId] = key
+  mkdirSync(KEYS_DIR, { recursive: true })
+  writeFileSync(KEYS_PATH, JSON.stringify(keys, null, 2))
+}
+
+function detectNamespace(): string {
+  try {
+    const url = execSync("git remote get-url origin", { stdio: ["ignore", "pipe", "ignore"] })
+      .toString()
+      .trim()
+    const name = basename(url).replace(/\.git$/, "").toLowerCase()
+    return name.length > 0 ? name : "scratch"
+  } catch {
+    return "scratch"
+  }
+}
+
+function requireToken(): string {
+  if (TOKEN === undefined || TOKEN.length === 0) {
+    console.error("DOSSIER_TOKEN is not set")
+    process.exit(1)
+  }
+  return TOKEN
+}
+
+async function req(method: string, path: string, bearer: string, body?: unknown): Promise<Response> {
+  const headers: Record<string, string> = { Authorization: `Bearer ${bearer}` }
+  if (body !== undefined) headers["Content-Type"] = "application/json"
+  return fetch(`${API}${path}`, {
+    method,
+    headers,
+    body: body === undefined ? undefined : JSON.stringify(body),
+  })
+}
+
+async function fail(context: string, res: Response): Promise<never> {
+  console.error(`${context}: ${res.status} ${await res.text()}`)
+  process.exit(1)
+}
+
+async function jsonOf(res: Response): Promise<Record<string, unknown>> {
+  const parsed: unknown = await res.json()
+  return isRecord(parsed) ? parsed : {}
+}
+
+function splitSiteId(value: string): [string, string] {
+  const [ns, slug] = value.split("/")
+  if (ns === undefined || slug === undefined || ns.length === 0 || slug.length === 0) {
+    console.error(`expected <namespace>/<slug>, got: ${value}`)
+    process.exit(1)
+  }
+  return [ns, slug]
+}
+
+async function keyFor(siteId: string): Promise<string> {
+  const cached = loadKeys()[siteId]
+  if (cached !== undefined) return cached
+  const [ns, slug] = splitSiteId(siteId)
+  const res = await req("POST", `/sites/${ns}/${slug}/rotate-key`, requireToken())
+  if (!res.ok) await fail(`cannot recover update_key for ${siteId}`, res)
+  const data = await jsonOf(res)
+  const key = str(data, "update_key")
+  if (key === null) await fail(`rotate-key returned no key for ${siteId}`, res)
+  saveKey(siteId, key)
+  return key
+}
+
+function flagValue(args: string[], name: string): string | undefined {
+  const found = args.find((a) => a.startsWith(`--${name}=`))
+  return found?.slice(name.length + 3)
+}
+
+const [command, target, ...rest] = process.argv.slice(2)
+
+if (command === "publish" && target !== undefined) {
+  const token = requireToken()
+  const inputPath = resolve(target)
+  const isDir = statSync(inputPath).isDirectory()
+  const slug =
+    flagValue(rest, "slug") ??
+    basename(inputPath).replace(/\.(html|md)$/, "").toLowerCase().replace(/[^a-z0-9-]+/g, "-")
+  const namespace = flagValue(rest, "namespace") ?? detectNamespace()
+  const siteId = `${namespace}/${slug}`
+
+  const htmlPath = isDir ? join(inputPath, "index.html") : inputPath
+  const html = readFileSync(htmlPath, "utf8")
+  const sourceCandidate = isDir ? null : inputPath.replace(/\.html$/, ".md")
+  const sourceMd =
+    sourceCandidate !== null && sourceCandidate !== inputPath && existsSync(sourceCandidate)
+      ? readFileSync(sourceCandidate, "utf8")
+      : undefined
+
+  const createRes = await req("POST", "/sites", token, {
+    namespace,
+    slug,
+    html,
+    source_md: sourceMd,
+  })
+  if (createRes.status === 201) {
+    const data = await jsonOf(createRes)
+    const url = str(data, "url")
+    const updateKey = str(data, "update_key")
+    if (updateKey !== null) saveKey(siteId, updateKey)
+    console.log(`published ${url ?? siteId}`)
+  } else if (createRes.status === 409) {
+    const key = await keyFor(siteId)
+    const putRes = await req("PUT", `/sites/${namespace}/${slug}`, key, {
+      html,
+      source_md: sourceMd,
+    })
+    if (!putRes.ok) await fail("update failed", putRes)
+    const data = await jsonOf(putRes)
+    console.log(`republished https://${HOST}/${siteId}/ (v${String(data["version"])})`)
+  } else {
+    await fail("publish failed", createRes)
+  }
+
+  if (isDir) {
+    const key = await keyFor(siteId)
+    const walk = (dir: string): string[] =>
+      readdirSync(dir).flatMap((f) => {
+        if (f.startsWith(".") || f === "CLAUDE.md") return []
+        const p = join(dir, f)
+        return statSync(p).isDirectory() ? walk(p) : [p]
+      })
+    for (const file of walk(inputPath)) {
+      const rel = relative(inputPath, file)
+      if (rel === "index.html") continue
+      const res = await fetch(
+        `${API}/sites/${namespace}/${slug}/assets?relative_path=${encodeURIComponent(rel)}`,
+        {
+          method: "POST",
+          headers: { Authorization: `Bearer ${key}` },
+          body: new Uint8Array(readFileSync(file)),
+        },
+      )
+      if (!res.ok) await fail(`asset ${rel} failed`, res)
+      console.log(`  asset ${rel}`)
+    }
+  }
+} else if (command === "pull" && target !== undefined) {
+  const token = requireToken()
+  const [ns, slug] = splitSiteId(target)
+  const sourceRes = await req("GET", `/sites/${ns}/${slug}/source`, token)
+  if (!sourceRes.ok) await fail("pull failed", sourceRes)
+  const commentsRes = await req("GET", `/sites/${ns}/${slug}/comments`, token)
+  const outDir = rest[0] !== undefined ? resolve(rest[0]) : process.cwd()
+  mkdirSync(outDir, { recursive: true })
+  writeFileSync(join(outDir, `${slug}.md`), await sourceRes.text())
+  if (commentsRes.ok)
+    writeFileSync(
+      join(outDir, `${slug}.comments.json`),
+      JSON.stringify(await jsonOf(commentsRes), null, 2),
+    )
+  console.log(`pulled ${target} → ${join(outDir, `${slug}.md`)} (+ ${slug}.comments.json)`)
+} else if (command === "list") {
+  const res = await req("GET", target !== undefined ? `/sites?namespace=${target}` : "/sites", requireToken())
+  if (!res.ok) await fail("list failed", res)
+  console.log(JSON.stringify(await jsonOf(res), null, 2))
+} else if (command === "comment" && target !== undefined) {
+  const token = requireToken()
+  const [ns, slug] = splitSiteId(target)
+  const body = rest.join(" ")
+  if (body.length === 0) {
+    console.error("usage: comment <ns/slug> <text>")
+    process.exit(1)
+  }
+  const res = await req("POST", `/sites/${ns}/${slug}/comments`, token, { body })
+  if (!res.ok) await fail("comment failed", res)
+  console.log("comment posted")
+} else if (command === "share" && target !== undefined) {
+  const [ns, slug] = splitSiteId(target)
+  const password = flagValue(rest, "password")
+  const key = await keyFor(target)
+  const res = await req(
+    "POST",
+    `/sites/${ns}/${slug}/share`,
+    key,
+    password !== undefined ? { password } : {},
+  )
+  if (!res.ok) await fail("share failed", res)
+  console.log(JSON.stringify(await jsonOf(res), null, 2))
+} else if (command === "unshare" && target !== undefined) {
+  const [ns, slug] = splitSiteId(target)
+  const key = await keyFor(target)
+  const res = await req("DELETE", `/sites/${ns}/${slug}/share`, key)
+  if (!res.ok) await fail("unshare failed", res)
+  console.log("share revoked")
+} else if (command === "delete" && target !== undefined) {
+  const [ns, slug] = splitSiteId(target)
+  const key = await keyFor(target)
+  const res = await req("DELETE", `/sites/${ns}/${slug}`, key)
+  if (!res.ok) await fail("delete failed", res)
+  console.log(`deleted ${target}`)
+} else {
+  console.error(`usage:
+  bun dossier.ts publish <file.html|dir> [--slug=x] [--namespace=x]
+  bun dossier.ts pull <ns/slug> [outdir]
+  bun dossier.ts list [namespace]
+  bun dossier.ts comment <ns/slug> <text>
+  bun dossier.ts share <ns/slug> [--password=x]
+  bun dossier.ts unshare <ns/slug>
+  bun dossier.ts delete <ns/slug>
+
+env: DOSSIER_TOKEN (required), DOSSIER_HOST (default teambrilliant.dev), DOSSIER_API (override for local dev)`)
+  process.exit(1)
+}

@@ -1,7 +1,7 @@
 {
   "name": "tap-skills",
   "description": "The operating system for human+agent dev teams. Enables agents to work autonomously and helps humans support them effectively. Assesses repo readiness, analyzes blast radius before merging, builds and runs release smoke-test catalogs, monitors system health, drives retrospectives, and builds navigable alignment-diagram atlases.",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "author": {
     "name": "Team Brilliant",
     "url": "https://teambrilliant.ai"

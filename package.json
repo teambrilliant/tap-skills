@@ -1,6 +1,6 @@
 {
   "name": "@teambrilliant/tap-skills",
-  "version": "0.11.0",
+  "version": "0.12.0",
   "description": "Team Brilliant operating-system skills for human+agent dev teams: repo readiness, blast radius, smoke tests, system health, and retrospectives.",
   "keywords": [
     "pi-package",

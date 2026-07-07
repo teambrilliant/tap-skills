@@ -1,0 +1,226 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>__TITLE__</title>
+<style>
+:root {
+  --ink: #101418;
+  --muted: #5b6470;
+  --line: #e6e8eb;
+  --line-soft: #f1f3f5;
+  --bg: #ffffff;
+  --bg-soft: #f7f9fa;
+  --accent: #1fa2ff;
+  --risk: #c0392b;
+  font-size: 15px;
+}
+:root[data-theme="dark"] {
+  --ink: #e8eaed;
+  --muted: #9aa3ad;
+  --line: #2a2f36;
+  --line-soft: #21252b;
+  --bg: #14171b;
+  --bg-soft: #1b1f24;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --ink: #e8eaed;
+    --muted: #9aa3ad;
+    --line: #2a2f36;
+    --line-soft: #21252b;
+    --bg: #14171b;
+    --bg-soft: #1b1f24;
+  }
+}
+* { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: system-ui, -apple-system, "Segoe UI", sans-serif;
+  color: var(--ink);
+  background: var(--bg);
+  line-height: 1.6;
+}
+header {
+  border-bottom: 2px solid var(--line);
+  padding: 2rem 2rem 1.25rem;
+  position: relative;
+}
+#theme-toggle {
+  position: absolute; top: 1rem; right: 1.25rem;
+  font: inherit; font-size: .78rem; color: var(--muted);
+  background: var(--bg-soft); border: 1px solid var(--line); border-radius: 999px;
+  padding: .3rem .85rem; cursor: pointer;
+}
+#theme-toggle:hover { color: var(--ink); }
+#crumb { display: inline-block; font-size: .8rem; color: var(--muted); text-decoration: none; margin-bottom: .5rem; }
+#crumb:hover { color: var(--accent); }
+a.wiki { text-decoration-style: dotted; }
+header .doc-title { margin: 0 0 .5rem; font-size: 1.6rem; letter-spacing: -.02em; }
+.fm-band { display: flex; flex-wrap: wrap; gap: .4rem 1.25rem; }
+.fm-band .fm { font-size: .8rem; color: var(--muted); }
+.fm-band .fm b { color: var(--ink); font-weight: 600; margin-right: .3rem; }
+.layout { display: flex; gap: 2.5rem; max-width: 1100px; margin: 0 auto; padding: 1.5rem 2rem 4rem; }
+nav#toc {
+  flex: 0 0 220px;
+  position: sticky; top: 1rem; align-self: flex-start;
+  font-size: .82rem; max-height: 90vh; overflow-y: auto;
+  border-right: 1px solid var(--line-soft); padding-right: 1.25rem;
+}
+nav#toc a { display: block; color: var(--muted); text-decoration: none; padding: .18rem 0; }
+nav#toc a:hover { color: var(--accent); }
+nav#toc a.h3 { padding-left: 1rem; }
+main { flex: 1; min-width: 0; }
+main h1, main h2, main h3 { letter-spacing: -.01em; scroll-margin-top: 1rem; }
+main h2 { border-bottom: 1px solid var(--line-soft); padding-bottom: .35rem; margin-top: 2.4rem; }
+main a { color: var(--accent); }
+main pre {
+  background: var(--bg-soft); border: 1px solid var(--line-soft); border-radius: 6px;
+  padding: .9rem 1.1rem; overflow-x: auto; font-size: .85rem; line-height: 1.5;
+}
+main code { font-family: ui-monospace, "SF Mono", Menlo, monospace; font-size: .88em; }
+main :not(pre) > code { background: var(--bg-soft); border: 1px solid var(--line-soft); border-radius: 4px; padding: .08em .35em; }
+main table { border-collapse: collapse; width: 100%; font-size: .9rem; display: block; overflow-x: auto; }
+main th, main td { border: 1px solid var(--line); padding: .45rem .7rem; text-align: left; }
+main th { background: var(--bg-soft); }
+main blockquote { border-left: 3px solid var(--accent); margin-left: 0; padding-left: 1rem; color: var(--muted); }
+main input[type="checkbox"] { accent-color: var(--accent); margin-right: .4rem; }
+main li.task { list-style: none; margin-left: -1.2rem; }
+main hr { border: 0; border-top: 1px solid var(--line); margin: 2.2rem 0; }
+main .mermaid { background: var(--bg-soft); border: 1px solid var(--line-soft); border-radius: 6px; padding: 1rem; text-align: center; }
+@media (max-width: 860px) { .layout { flex-direction: column; } nav#toc { position: static; border-right: 0; } }
+</style>
+<script>
+  (function () {
+    var saved = localStorage.getItem("dossier-theme")
+    if (saved === "light" || saved === "dark") document.documentElement.setAttribute("data-theme", saved)
+  })()
+</script>
+</head>
+<body>
+<header>
+  <button id="theme-toggle" type="button"></button>
+  <h1 class="doc-title">__TITLE__</h1>
+  <div class="fm-band">__FRONTMATTER__</div>
+</header>
+<div class="layout">
+  <nav id="toc"></nav>
+  <main id="content"></main>
+</div>
+<script type="application/json" id="src">__MARKDOWN_JSON__</script>
+<script type="application/json" id="tree">__TREE_JSON__</script>
+<script>__MARKED__</script>
+<script>__MERMAID__</script>
+<script>
+(function () {
+  var source = JSON.parse(document.getElementById("src").textContent)
+  var treeRaw = document.getElementById("tree").textContent
+  var tree = treeRaw.trim() ? JSON.parse(treeRaw) : null
+  var content = document.getElementById("content")
+  content.innerHTML = marked.parse(source, { gfm: true, breaks: false })
+
+  if (tree) {
+    if (tree.prefix !== "") {
+      var crumb = document.createElement("a")
+      crumb.id = "crumb"
+      crumb.href = tree.prefix + "index.html"
+      crumb.textContent = "← " + tree.siteTitle
+      var header = document.querySelector("header")
+      header.insertBefore(crumb, header.querySelector(".doc-title"))
+    }
+    var walker = document.createTreeWalker(content, NodeFilter.SHOW_TEXT, {
+      acceptNode: function (n) {
+        return n.parentElement.closest("pre, code")
+          ? NodeFilter.FILTER_REJECT
+          : NodeFilter.FILTER_ACCEPT
+      },
+    })
+    var wikiNodes = []
+    while (walker.nextNode())
+      if (walker.currentNode.nodeValue.indexOf("[[") !== -1) wikiNodes.push(walker.currentNode)
+    wikiNodes.forEach(function (node) {
+      var frag = document.createDocumentFragment()
+      node.nodeValue.split(/(\[\[[^\]]+\]\])/).forEach(function (part) {
+        var m = part.match(/^\[\[([^\]|]+)(?:\|([^\]]+))?\]\]$/)
+        if (m && tree.map[m[1]]) {
+          var a = document.createElement("a")
+          a.className = "wiki"
+          a.href = tree.prefix + tree.map[m[1]]
+          a.textContent = m[2] || m[1]
+          frag.appendChild(a)
+        } else {
+          frag.appendChild(document.createTextNode(part))
+        }
+      })
+      node.parentNode.replaceChild(frag, node)
+    })
+  }
+
+  var docTitle = document.querySelector(".doc-title").textContent.trim()
+  var firstH1 = content.querySelector("h1")
+  if (firstH1 && firstH1.textContent.trim() === docTitle) firstH1.remove()
+
+  content.querySelectorAll("li").forEach(function (li) {
+    if (li.querySelector(':scope > input[type="checkbox"]')) li.classList.add("task")
+  })
+
+  content.querySelectorAll("a[href]").forEach(function (a) {
+    var href = a.getAttribute("href")
+    if (/^[a-z][a-z0-9+.-]*:|^\/\/|^#|^\//i.test(href)) return
+    var m = href.match(/^([^#?]*)\.md(#.*)?$/)
+    if (!m) return
+    var path = m[1]
+    if (/(^|\/)README$/.test(path)) path = path.replace(/README$/, "index")
+    a.setAttribute("href", path + ".html" + (m[2] || ""))
+  })
+
+  var toc = document.getElementById("toc")
+  var headings = content.querySelectorAll("h2, h3")
+  headings.forEach(function (h, i) {
+    if (!h.id) h.id = "s" + i + "-" + h.textContent.toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "")
+    var a = document.createElement("a")
+    a.href = "#" + h.id
+    a.textContent = h.textContent
+    if (h.tagName === "H3") a.className = "h3"
+    toc.appendChild(a)
+  })
+  if (headings.length === 0) toc.remove()
+
+  var toggle = document.getElementById("theme-toggle")
+  var themeLabel = { auto: "◐ Auto", light: "☀ Light", dark: "● Dark" }
+  var themeOrder = ["auto", "light", "dark"]
+  var currentTheme = localStorage.getItem("dossier-theme")
+  if (themeOrder.indexOf(currentTheme) === -1) currentTheme = "auto"
+  var applyTheme = function () {
+    if (currentTheme === "auto") {
+      document.documentElement.removeAttribute("data-theme")
+      localStorage.removeItem("dossier-theme")
+    } else {
+      document.documentElement.setAttribute("data-theme", currentTheme)
+      localStorage.setItem("dossier-theme", currentTheme)
+    }
+    toggle.textContent = themeLabel[currentTheme]
+  }
+  toggle.addEventListener("click", function () {
+    currentTheme = themeOrder[(themeOrder.indexOf(currentTheme) + 1) % themeOrder.length]
+    applyTheme()
+  })
+  applyTheme()
+
+  var mermaidBlocks = content.querySelectorAll("pre code.language-mermaid")
+  if (mermaidBlocks.length > 0 && typeof mermaid !== "undefined") {
+    mermaidBlocks.forEach(function (code) {
+      var div = document.createElement("div")
+      div.className = "mermaid"
+      div.textContent = code.textContent
+      code.closest("pre").replaceWith(div)
+    })
+    mermaid.initialize({ startOnLoad: false, theme: window.matchMedia("(prefers-color-scheme: dark)").matches ? "dark" : "default" })
+    mermaid.run()
+  }
+})()
+</script>
+</body>
+</html>

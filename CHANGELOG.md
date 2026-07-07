@@ -2,6 +2,16 @@
 
 All notable changes to this package are documented here. Versions follow [Semantic Versioning](https://semver.org/).
 
+## [0.12.0]
+
+### Dossier publishing pipeline — render-doc + publish
+
+Two new skills form the client side of [Dossier](https://github.com/teambrilliant/dossier), the team's private doc platform at teambrilliant.dev: render markdown deterministically, publish anywhere, pull source + comments back on any machine.
+
+**Added**
+- `render-doc` — deterministic md → self-contained HTML (template + vendored marked/mermaid, no LLM-authored markup). Frontmatter header band, TOC, task lists, light/dark/auto theme selector, source md embedded losslessly (JSON, `<`-escaped) and recoverable from the file. Tree mode (`render-tree.ts`): renders a whole docs directory into a linked bundle — README → index + generated Contents section, relative `.md` links rewritten at view time, Obsidian-style `[[wiki-links]]` resolved via a per-bundle map, breadcrumbs on every page.
+- `publish` — Dossier client (`DOSSIER_TOKEN`): publish single docs or directory bundles (atlases, rendered trees), republish to the same URL, `pull` source + comments for cross-machine continuity, `comment`, `share`/`unshare` (external links, optional password), `list`, `delete`. Update keys cached locally, auto-recovered by rotation on fresh machines.
+
 ## [0.11.0]
 
 ### Adopted the two harness meta-skills from dev-skills
