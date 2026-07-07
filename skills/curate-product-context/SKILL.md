@@ -167,6 +167,13 @@ On `yes`:
 - Create `.tap/` if it doesn't exist.
 - Write `.tap/product.md`.
 - Confirm write + line count.
+- **Wire discoverability**: `.tap/product.md` is only read by agents that know it exists —
+  CLAUDE.md is the one file loaded automatically. Check the repo's `CLAUDE.md` for a
+  reference to `.tap/product.md`; if absent, add a one-line pointer (show the diff, then
+  write): `Product-strategic context (audience, current focus, bets, non-goals) lives in
+  .tap/product.md — read it before making product or scope decisions in this repo.` If no
+  `CLAUDE.md` exists, tell the user the artifact is invisible to agents until one references
+  it, and offer to create a minimal CLAUDE.md with just that pointer.
 
 On `edit`: loop back to step 4 with the requested changes.
 On `cancel`: discard the draft. Do not write.

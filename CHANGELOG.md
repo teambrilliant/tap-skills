@@ -2,6 +2,11 @@
 
 All notable changes to this package are documented here. Versions follow [Semantic Versioning](https://semver.org/).
 
+## [0.12.1]
+
+**Changed**
+- `curate-product-context` — after writing `.tap/product.md`, the skill now wires discoverability: it checks CLAUDE.md for a pointer to the artifact and adds a one-line reference if missing (CLAUDE.md is the only auto-loaded file; without the pointer the product context is invisible to agents).
+
 ## [0.12.0]
 
 ### Dossier publishing pipeline — render-doc + publish
