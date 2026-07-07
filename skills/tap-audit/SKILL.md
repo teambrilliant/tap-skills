@@ -230,6 +230,14 @@ Then:
 - Log readiness score
 - Proceed to assigned task
 
+## Wire discoverability
+
+`.tap/tap-audit.md` and `.tap/architecture.md` are only read by agents that know they exist — CLAUDE.md is the only file loaded automatically. After writing, check the repo's CLAUDE.md for a `.tap/` context-index line:
+
+- **Index line exists** → make sure it mentions `tap-audit.md` (readiness scorecard) and `architecture.md` (system decisions); append if missing.
+- **No index line** → add one (show the diff, write on confirm): `Durable project context lives in .tap/ — tap-audit.md (readiness scorecard), architecture.md (system decisions)[, plus any other .tap/ files present]. Read the relevant file before deciding in that area.`
+- **No CLAUDE.md** → tell the user the artifacts are invisible to agents until something references them; offer a minimal CLAUDE.md containing just that pointer.
+
 ## Boundaries
 
 - Does NOT describe the tech stack (CLAUDE.md's job)

@@ -136,9 +136,19 @@ Use the template in [references/learnings-template.md](references/learnings-temp
 
 Agents read `.tap/learnings.md` before starting work. Captured learnings prevent the same mistakes from repeating across sessions.
 
+## Wire discoverability
+
+`.tap/learnings.md` is only read by agents that know it exists — CLAUDE.md is the only file loaded automatically. After writing, check the repo's CLAUDE.md for a `.tap/` context-index line:
+
+- **Index line exists** → make sure it mentions `learnings.md` (accumulated retro learnings); append if missing.
+- **No index line** → add one (show the diff, write on confirm): `Durable project context lives in .tap/ — learnings.md (accumulated retro learnings)[, plus any other .tap/ files present]. Read the relevant file before deciding in that area.`
+- **No CLAUDE.md** → tell the user the learnings are invisible to agents until something references them; offer a minimal CLAUDE.md containing just that pointer.
+
+This is the one exception to the CLAUDE.md boundary below: a single diff-confirmed pointer line, never learnings content.
+
 ## Boundaries
 
-- Does NOT edit CLAUDE.md or AGENTS.md (creates tickets suggesting updates — human decides)
+- Does NOT edit CLAUDE.md or AGENTS.md beyond the single discoverability pointer above (content updates become tickets — human decides)
 - Does NOT edit .tap/architecture.md (creates tickets — human decides on ADRs)
 - Does NOT assign blame or assess team performance
 - Does NOT follow a calendar — runs when there's something to learn from

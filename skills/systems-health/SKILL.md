@@ -142,6 +142,14 @@ If prior `.tap/system-health.md` exists, compare trends. Call out what improved 
 
 **Agent mode**: Write `.tap/system-health.md` silently. If run as part of a `/retrospective`, feed findings into the retro.
 
+## Wire discoverability
+
+`.tap/system-health.md` is only read by agents that know it exists — CLAUDE.md is the only file loaded automatically. After writing, check the repo's CLAUDE.md for a `.tap/` context-index line:
+
+- **Index line exists** → make sure it mentions `system-health.md` (delivery health check-in); append if missing.
+- **No index line** → add one (show the diff, write on confirm): `Durable project context lives in .tap/ — system-health.md (delivery health check-in)[, plus any other .tap/ files present]. Read the relevant file before deciding in that area.`
+- **No CLAUDE.md** → tell the user the artifact is invisible to agents until something references it; offer a minimal CLAUDE.md containing just that pointer.
+
 ## Boundaries
 
 - Read-only — does NOT modify code, config, or process

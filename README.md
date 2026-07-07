@@ -38,7 +38,7 @@ Or install directly from GitHub:
 | `/tap-skills:qa-smoke-run`   | Execute the smoke-test catalog in a browser and report only what's broken |
 | `/tap-skills:alignment-atlas` | Generate/maintain alignment-diagram atlases — flow-by-flow grids on one navigable surface (default `.tap/diagrams/atlas/`, or any target dir, e.g. per PARA area) |
 | `/tap-skills:render-doc`    | Deterministically render a markdown doc (or a whole docs tree with wiki-links) into self-contained styled HTML — the pre-publish step |
-| `/tap-skills:publish`       | Publish docs/bundles to the private Dossier platform (teambrilliant.dev): publish, pull source+comments on any machine, share externally, archive |
+| `/tap-skills:dossier-publish`       | Publish docs/bundles to the private Dossier platform (teambrilliant.dev): publish, pull source+comments on any machine, share externally, archive |
 
 ## How they work together
 

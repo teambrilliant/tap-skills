@@ -223,6 +223,14 @@ Create `.tap/` directory if it doesn't exist. Write the roadmap using the templa
 
 **Review cadence:** Recommend quarterly reviews where the CTO revisits this roadmap, updates progress against milestones, adjusts bets based on new data, and prepares the next board update.
 
+## Wire discoverability
+
+`.tap/tech-roadmap.md` is only read by agents that know it exists — CLAUDE.md is the only file loaded automatically. After writing, check the repo's CLAUDE.md for a `.tap/` context-index line:
+
+- **Index line exists** → make sure it mentions `tech-roadmap.md` (12-month outcome roadmap); append if missing.
+- **No index line** → add one (show the diff, write on confirm): `Durable project context lives in .tap/ — tech-roadmap.md (12-month outcome roadmap)[, plus any other .tap/ files present]. Read the relevant file before deciding in that area.`
+- **No CLAUDE.md** → tell the user the artifact is invisible to agents until something references it; offer a minimal CLAUDE.md containing just that pointer.
+
 ## Boundaries
 
 - Does NOT make final strategic decisions — structures the CTO's thinking

@@ -2,6 +2,14 @@
 
 All notable changes to this package are documented here. Versions follow [Semantic Versioning](https://semver.org/).
 
+## [0.13.0]
+
+### Rename: `publish` → `dossier-publish`; discoverability wiring everywhere
+
+**Changed**
+- **`publish` renamed to `dossier-publish`** — bare "publish" was ambiguous at invocation time (npm? blog? git?). Invoke as `/tap-skills:dossier-publish`; description now carries a scope guard. All cross-references updated (render-doc, README, dev-skills handoffs, Dossier's agent-handoff prompt).
+- **Every artifact-writing skill now wires discoverability**: after writing its `.tap/` artifact, the skill ensures the repo's CLAUDE.md carries a single growing `.tap/` context-index line naming the artifacts that exist (CLAUDE.md is the only auto-loaded file — an unreferenced artifact is invisible to agents). Applied to `tap-audit` (tap-audit.md + architecture.md), `systems-health`, `tech-roadmap`, `qa-smoke-catalog`, `retrospective` (learnings.md — carved a one-line exception into its no-CLAUDE.md-edits boundary), `alignment-atlas` (atlas path, incl. per-area), and `curate-product-context` (converted from the 0.12.1 per-file pointer to the shared index line). `qa-smoke-run` deliberately skipped: its `qa-runs/` output is ephemeral run evidence, not durable context.
+
 ## [0.12.1]
 
 **Changed**

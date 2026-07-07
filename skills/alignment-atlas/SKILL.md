@@ -126,6 +126,14 @@ window.<Registry>.register({
 
 Cell value by kind: `html`=string · `quote`=string · `mot`={level,text} · `status`=[{k}] · `acceptance`=string[]|{text,optional}[] · `kv`=[{k,v,todo}].
 
+## Wire discoverability
+
+An atlas is only read by agents that know it exists — CLAUDE.md is the only file loaded automatically. After scaffolding (and when mapping adds the first flow), check the repo's CLAUDE.md for a `.tap/` context-index line:
+
+- **Index line exists** → make sure it mentions the atlas path (e.g. `diagrams/atlas/` — alignment maps of how the system behaves, flow by flow); for per-area atlases, name the actual path. Append if missing.
+- **No index line** → add one (show the diff, write on confirm): `Durable project context lives in .tap/ — diagrams/atlas/ (alignment maps: how the system behaves, flow by flow)[, plus any other .tap/ files present]. Read the relevant file before deciding in that area.`
+- **No CLAUDE.md** → tell the user the atlas is invisible to agents until something references it; offer a minimal CLAUDE.md containing just that pointer.
+
 ## Handoffs
 
 - **Unsure who the flow serves / what the layers should be** → `/dev-skills:product-thinker` (the user defines the layers).

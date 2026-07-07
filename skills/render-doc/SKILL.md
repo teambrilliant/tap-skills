@@ -1,6 +1,6 @@
 ---
 name: render-doc
-description: Deterministically convert a markdown doc (plan, research, shape, report) into one self-contained HTML file with house styling, TOC, checklists, and mermaid support. Use when someone says "render this doc", "render this plan", "make this markdown a web page", "convert md to html", "make this plan shareable as HTML", or before publishing a markdown doc with tap-skills:publish. NOT for authoring content — the markdown is the source of truth; this only renders it.
+description: Deterministically convert a markdown doc (plan, research, shape, report) into one self-contained HTML file with house styling, TOC, checklists, and mermaid support. Use when someone says "render this doc", "render this plan", "make this markdown a web page", "convert md to html", "make this plan shareable as HTML", or before publishing a markdown doc with tap-skills:dossier-publish. NOT for authoring content — the markdown is the source of truth; this only renders it.
 ---
 
 # Render Doc
@@ -23,7 +23,7 @@ Tree mode renders every `.md` preserving directory structure (`README.md` → `i
 each level), copies non-md files (images etc.) as-is, and writes a publishable bundle to
 `outdir` (default: a `dossier-site` temp dir; never renders into the source tree). Relative
 `.md` links in docs are rewritten to `.html` at view time, so cross-doc navigation works.
-Publish the outdir as a directory bundle with `tap-skills:publish`.
+Publish the outdir as a directory bundle with `tap-skills:dossier-publish`.
 
 - Output defaults to the input path with `.html` extension (sibling of the source).
 - Frontmatter (`---` block) becomes the header band; `title:` overrides the doc title,
@@ -45,7 +45,7 @@ Publish the outdir as a directory bundle with `tap-skills:publish`.
 
 1. A planning skill produces `thoughts/plans/<name>.md` (or research/shape doc).
 2. `render.ts` → `<name>.html` next to it.
-3. Optionally publish: `/tap-skills:publish` uploads the HTML (and the md as source) to
+3. Optionally publish: `/tap-skills:dossier-publish` uploads the HTML (and the md as source) to
    teambrilliant.dev.
 
 Do not commit generated `.html` files unless asked — like the `thoughts/` sources, they are

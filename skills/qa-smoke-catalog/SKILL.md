@@ -114,6 +114,14 @@ Then write the curated cases following those conventions exactly. Each case is:
 
 The catalog you produce is executed by `qa-smoke-run`. That skill depends on the structure: `## Setup` parsed as run config, `## Conventions` ignored at run time, `## Test case:` headers used to split cases, `> ` note blocks treated as context rather than steps. Keep the structure clean and conventional — a malformed catalog silently breaks the runner.
 
+## Wire discoverability
+
+`.tap/smoke-tests.md` is only read by agents that know it exists — CLAUDE.md is the only file loaded automatically. After writing, check the repo's CLAUDE.md for a `.tap/` context-index line:
+
+- **Index line exists** → make sure it mentions `smoke-tests.md` (release smoke-test catalog); append if missing.
+- **No index line** → add one (show the diff, write on confirm): `Durable project context lives in .tap/ — smoke-tests.md (release smoke-test catalog)[, plus any other .tap/ files present]. Read the relevant file before deciding in that area.`
+- **No CLAUDE.md** → tell the user the catalog is invisible to agents until something references it; offer a minimal CLAUDE.md containing just that pointer.
+
 ## Boundaries
 
 - Does NOT execute the catalog — that's `qa-smoke-run`.

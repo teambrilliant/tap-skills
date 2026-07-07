@@ -168,12 +168,11 @@ On `yes`:
 - Write `.tap/product.md`.
 - Confirm write + line count.
 - **Wire discoverability**: `.tap/product.md` is only read by agents that know it exists —
-  CLAUDE.md is the one file loaded automatically. Check the repo's `CLAUDE.md` for a
-  reference to `.tap/product.md`; if absent, add a one-line pointer (show the diff, then
-  write): `Product-strategic context (audience, current focus, bets, non-goals) lives in
-  .tap/product.md — read it before making product or scope decisions in this repo.` If no
-  `CLAUDE.md` exists, tell the user the artifact is invisible to agents until one references
-  it, and offer to create a minimal CLAUDE.md with just that pointer.
+  CLAUDE.md is the only file loaded automatically. Check the repo's CLAUDE.md for a `.tap/`
+  context-index line:
+  - **Index line exists** → make sure it mentions `product.md` (product strategy: audience, focus, bets, non-goals); append if missing.
+  - **No index line** → add one (show the diff, write on confirm): `Durable project context lives in .tap/ — product.md (product strategy: audience, focus, bets, non-goals)[, plus any other .tap/ files present]. Read the relevant file before deciding in that area.`
+  - **No CLAUDE.md** → tell the user the artifact is invisible to agents until something references it; offer a minimal CLAUDE.md containing just that pointer.
 
 On `edit`: loop back to step 4 with the requested changes.
 On `cancel`: discard the draft. Do not write.
