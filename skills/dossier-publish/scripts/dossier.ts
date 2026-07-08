@@ -154,12 +154,17 @@ if (command === "publish" && target !== undefined) {
   const namespace = flagValue(rest, "namespace") ?? detectNamespace()
   const siteId = `${namespace}/${slug}`
   const doc = readDoc(inputPath)
+  const only = flagValue(rest, "only")
 
   const createRes = await req("POST", "/sites", token, {
     namespace,
     slug,
     html: doc.html,
     source_md: doc.sourceMd,
+    restricted_to:
+      only === undefined
+        ? undefined
+        : only.split(",").map((s) => s.trim()).filter((s) => s.length > 0),
   })
   if (createRes.status === 409) {
     const data = await jsonOf(createRes)
@@ -182,6 +187,9 @@ if (command === "publish" && target !== undefined) {
   const updateKey = str(data, "update_key")
   if (updateKey !== null) saveKey(siteId, updateKey)
   console.log(`published ${url ?? siteId}`)
+  const restrictedTo = data["restricted_to"]
+  if (Array.isArray(restrictedTo) && restrictedTo.length > 0)
+    console.log(`  restricted to: ${restrictedTo.join(", ")}`)
   if (doc.isDir) await uploadAssets(namespace, slug, inputPath)
 } else if (command === "republish" && target !== undefined && rest[0] !== undefined) {
   const [ns, slug] = splitSiteId(target)
@@ -244,6 +252,24 @@ if (command === "publish" && target !== undefined) {
   const res = await req("DELETE", `/sites/${ns}/${slug}/share`, key)
   if (!res.ok) await fail("unshare failed", res)
   console.log("share revoked")
+} else if (command === "restrict" && target !== undefined) {
+  const [ns, slug] = splitSiteId(target)
+  const only = flagValue(rest, "only")
+  if (only === undefined) {
+    console.error("usage: restrict <ns/slug> --only=me | --only=a@x,b@y | --only=org")
+    process.exit(1)
+  }
+  const payload = {
+    restricted_to:
+      only === "org" ? null : only.split(",").map((s) => s.trim()).filter((s) => s.length > 0),
+  }
+  let res = await req("POST", `/sites/${ns}/${slug}/restrict`, requireToken(), payload)
+  if (res.status === 401)
+    res = await req("POST", `/sites/${ns}/${slug}/restrict`, await keyFor(target), payload)
+  if (!res.ok) await fail("restrict failed", res)
+  const data = await jsonOf(res)
+  const list = data["restricted_to"]
+  console.log(Array.isArray(list) ? `restricted to: ${list.join(", ")}` : "org-visible")
 } else if (command === "delete" && target !== undefined) {
   const [ns, slug] = splitSiteId(target)
   const key = await keyFor(target)
@@ -252,13 +278,14 @@ if (command === "publish" && target !== undefined) {
   console.log(`deleted ${target}`)
 } else {
   console.error(`usage:
-  bun dossier.ts publish <file.html|dir> --slug=x [--namespace=x]   # create; never overwrites
+  bun dossier.ts publish <file.html|dir> --slug=x [--namespace=x] [--only=me|a@x,...]   # create; never overwrites
   bun dossier.ts republish <ns/slug> <file.html|dir>                # update; same URL, new version
   bun dossier.ts pull <ns/slug> [outdir]
   bun dossier.ts list [namespace]
   bun dossier.ts comment <ns/slug> <text>
   bun dossier.ts share <ns/slug> [--password=x]
   bun dossier.ts unshare <ns/slug>
+  bun dossier.ts restrict <ns/slug> --only=me|a@x,b@y|org   # viewer allowlist (keyed)
   bun dossier.ts delete <ns/slug>
 
 env: DOSSIER_TOKEN (required), DOSSIER_HOST (default teambrilliant.dev), DOSSIER_API (override for local dev)`)

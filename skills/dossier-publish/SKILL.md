@@ -90,6 +90,20 @@ bun scripts/dossier.ts unshare <ns>/<slug>                  # revoke immediately
 Share links are bearer credentials — prefer `--password` for client-data docs, and never
 publish anything credential-bearing. Re-sharing mints a fresh URL; old links stay dead.
 
+## Restricted docs (private drafts, sensitive workstreams)
+
+```bash
+bun scripts/dossier.ts publish sales.html --slug=sales-motion --only=me
+bun scripts/dossier.ts restrict <ns>/<slug> --only=you@x,partner@x   # change the list
+bun scripts/dossier.ts restrict <ns>/<slug> --only=org               # back to org-visible
+```
+
+Restricted docs 404 for everyone not on the list (org pages, home, and API) — except
+the owning token, which always retains API access. `me` resolves to your token's
+attributed email server-side. Lists are flat emails — no roles or groups by design.
+Composes with external sharing: `--only=me` + `share --password` = hidden from the
+team, readable by whoever holds the link and password.
+
 ## Housekeeping
 
 ```bash
