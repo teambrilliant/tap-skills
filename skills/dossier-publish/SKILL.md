@@ -17,28 +17,46 @@ bun <this-skill-dir>/scripts/dossier.ts <command> ...
 `DOSSIER_TOKEN` must be set (minted by the platform operator; see dossier repo
 `scripts/mint-token.ts`). `DOSSIER_API` overrides the endpoint for local dev.
 
-## Publish a doc
+## Name the doc, then publish (first time)
+
+Slug rules — set identity explicitly; never rely on the filename default:
+
+- Always pass `--slug`.
+- If the doc lives under a project/area directory, prefix the slug with the project:
+  `areas/emma/diagrams/atlas` → `--slug=emma-atlas`. The slug and URL should answer
+  "whose atlas?" on their own.
+- Give the doc's H1/`<title>` the same identity ("Emma — Alignment Atlas") — the home
+  page lists and searches by title.
 
 ```bash
 # markdown docs: render first (deterministic), then publish — the sibling .md is
 # uploaded automatically as the doc's source for round-trip pulls
 bun <render-doc-skill-dir>/scripts/render.ts thoughts/plans/my-plan.md
-bun scripts/dossier.ts publish thoughts/plans/my-plan.html
+bun scripts/dossier.ts publish thoughts/plans/my-plan.html --slug=emma-auth-plan
 
 # directory bundles (e.g. an alignment atlas)
-bun scripts/dossier.ts publish .tap/diagrams/atlas --slug=atlas
+bun scripts/dossier.ts publish areas/emma/diagrams/atlas --slug=emma-atlas
 
-# markdown docs TREE (e.g. docs/behavior-catalog): render to a bundle first
+# markdown docs TREE: render to a bundle first
 bun <render-doc-skill-dir>/scripts/render-tree.ts docs/behavior-catalog
 bun scripts/dossier.ts publish <printed outdir> --slug=behavior-catalog
 ```
 
-Bundle notes: dotfiles and `CLAUDE.md` are never uploaded; comments attach to the bundle as
-a whole (one thread, shown on every page).
+`publish` **creates** — if the slug is already taken it stops and tells you what lives
+there; it never overwrites.
+
+## Update a published doc
+
+```bash
+bun scripts/dossier.ts republish <ns>/<slug> <file.html|dir>
+# same URL, new version, comments intact; bundle assets re-uploaded
+```
+
+Bundle notes: dotfiles and `CLAUDE.md` are never uploaded; comments attach to the bundle
+as a whole (one thread, shown on every page).
 
 - Namespace defaults to the current repo name (git remote); `--namespace=scratch` for
   repo-less docs. URL: `https://teambrilliant.dev/<namespace>/<slug>/`.
-- Re-publishing the same slug updates the same URL (new version; history kept server-side).
 - `update_key`s are cached in `~/.config/dossier/keys.json` (machine-local). On a fresh
   machine the script recovers access automatically by rotating the key with your token.
 
@@ -46,7 +64,7 @@ a whole (one thread, shown on every page).
 
 ```bash
 bun scripts/dossier.ts pull <namespace>/<slug> [outdir]   # → <slug>.md + <slug>.comments.json
-# ...edit the md, re-render, publish — same URL, comments intact
+# ...edit the md, re-render, then: republish <ns>/<slug> <file.html> — same URL, comments intact
 ```
 
 **Always `pull` before resuming work** on a doc that lives on the platform — someone (or

@@ -88,6 +88,12 @@ async function keyFor(siteId: string): Promise<string> {
   if (cached !== undefined) return cached
   const [ns, slug] = splitSiteId(siteId)
   const res = await req("POST", `/sites/${ns}/${slug}/rotate-key`, requireToken())
+  if (res.status === 404) {
+    console.error(
+      `${siteId} does not exist — create it first: bun dossier.ts publish <file.html|dir> --slug=${slug} --namespace=${ns}`,
+    )
+    process.exit(1)
+  }
   if (!res.ok) await fail(`cannot recover update_key for ${siteId}`, res)
   const data = await jsonOf(res)
   const key = str(data, "update_key")
@@ -101,18 +107,8 @@ function flagValue(args: string[], name: string): string | undefined {
   return found?.slice(name.length + 3)
 }
 
-const [command, target, ...rest] = process.argv.slice(2)
-
-if (command === "publish" && target !== undefined) {
-  const token = requireToken()
-  const inputPath = resolve(target)
+function readDoc(inputPath: string): { html: string; sourceMd: string | undefined; isDir: boolean } {
   const isDir = statSync(inputPath).isDirectory()
-  const slug =
-    flagValue(rest, "slug") ??
-    basename(inputPath).replace(/\.(html|md)$/, "").toLowerCase().replace(/[^a-z0-9-]+/g, "-")
-  const namespace = flagValue(rest, "namespace") ?? detectNamespace()
-  const siteId = `${namespace}/${slug}`
-
   const htmlPath = isDir ? join(inputPath, "index.html") : inputPath
   const html = readFileSync(htmlPath, "utf8")
   const sourceCandidate = isDir ? null : inputPath.replace(/\.html$/, ".md")
@@ -120,55 +116,86 @@ if (command === "publish" && target !== undefined) {
     sourceCandidate !== null && sourceCandidate !== inputPath && existsSync(sourceCandidate)
       ? readFileSync(sourceCandidate, "utf8")
       : undefined
+  return { html, sourceMd, isDir }
+}
+
+async function uploadAssets(namespace: string, slug: string, inputPath: string): Promise<void> {
+  const key = await keyFor(`${namespace}/${slug}`)
+  const walk = (dir: string): string[] =>
+    readdirSync(dir).flatMap((f) => {
+      if (f.startsWith(".") || f === "CLAUDE.md") return []
+      const p = join(dir, f)
+      return statSync(p).isDirectory() ? walk(p) : [p]
+    })
+  for (const file of walk(inputPath)) {
+    const rel = relative(inputPath, file)
+    if (rel === "index.html") continue
+    const res = await fetch(
+      `${API}/sites/${namespace}/${slug}/assets?relative_path=${encodeURIComponent(rel)}`,
+      {
+        method: "POST",
+        headers: { Authorization: `Bearer ${key}` },
+        body: new Uint8Array(readFileSync(file)),
+      },
+    )
+    if (!res.ok) await fail(`asset ${rel} failed`, res)
+    console.log(`  asset ${rel}`)
+  }
+}
+
+const [command, target, ...rest] = process.argv.slice(2)
+
+if (command === "publish" && target !== undefined) {
+  const token = requireToken()
+  const inputPath = resolve(target)
+  const slug =
+    flagValue(rest, "slug") ??
+    basename(inputPath).replace(/\.(html|md)$/, "").toLowerCase().replace(/[^a-z0-9-]+/g, "-")
+  const namespace = flagValue(rest, "namespace") ?? detectNamespace()
+  const siteId = `${namespace}/${slug}`
+  const doc = readDoc(inputPath)
 
   const createRes = await req("POST", "/sites", token, {
     namespace,
     slug,
-    html,
-    source_md: sourceMd,
+    html: doc.html,
+    source_md: doc.sourceMd,
   })
-  if (createRes.status === 201) {
+  if (createRes.status === 409) {
     const data = await jsonOf(createRes)
-    const url = str(data, "url")
-    const updateKey = str(data, "update_key")
-    if (updateKey !== null) saveKey(siteId, updateKey)
-    console.log(`published ${url ?? siteId}`)
-  } else if (createRes.status === 409) {
-    const key = await keyFor(siteId)
-    const putRes = await req("PUT", `/sites/${namespace}/${slug}`, key, {
-      html,
-      source_md: sourceMd,
-    })
-    if (!putRes.ok) await fail("update failed", putRes)
-    const data = await jsonOf(putRes)
-    console.log(`republished https://${HOST}/${siteId}/ (v${String(data["version"])})`)
-  } else {
-    await fail("publish failed", createRes)
+    const title = str(data, "title")
+    const updated = str(data, "updated_at")
+    const version = data["version"]
+    console.error(
+      `${siteId} already exists` +
+        (title !== null ? `: "${title}"` : "") +
+        (typeof version === "number" ? ` (v${String(version)}` : " (") +
+        (updated !== null ? `, updated ${updated})` : ")"),
+    )
+    console.error(`  update that doc:   bun dossier.ts republish ${siteId} ${target}`)
+    console.error(`  or distinct slug:  bun dossier.ts publish ${target} --slug=<project>-${slug}`)
+    process.exit(1)
   }
-
-  if (isDir) {
-    const key = await keyFor(siteId)
-    const walk = (dir: string): string[] =>
-      readdirSync(dir).flatMap((f) => {
-        if (f.startsWith(".") || f === "CLAUDE.md") return []
-        const p = join(dir, f)
-        return statSync(p).isDirectory() ? walk(p) : [p]
-      })
-    for (const file of walk(inputPath)) {
-      const rel = relative(inputPath, file)
-      if (rel === "index.html") continue
-      const res = await fetch(
-        `${API}/sites/${namespace}/${slug}/assets?relative_path=${encodeURIComponent(rel)}`,
-        {
-          method: "POST",
-          headers: { Authorization: `Bearer ${key}` },
-          body: new Uint8Array(readFileSync(file)),
-        },
-      )
-      if (!res.ok) await fail(`asset ${rel} failed`, res)
-      console.log(`  asset ${rel}`)
-    }
-  }
+  if (createRes.status !== 201) await fail("publish failed", createRes)
+  const data = await jsonOf(createRes)
+  const url = str(data, "url")
+  const updateKey = str(data, "update_key")
+  if (updateKey !== null) saveKey(siteId, updateKey)
+  console.log(`published ${url ?? siteId}`)
+  if (doc.isDir) await uploadAssets(namespace, slug, inputPath)
+} else if (command === "republish" && target !== undefined && rest[0] !== undefined) {
+  const [ns, slug] = splitSiteId(target)
+  const inputPath = resolve(rest[0])
+  const doc = readDoc(inputPath)
+  const key = await keyFor(target)
+  const putRes = await req("PUT", `/sites/${ns}/${slug}`, key, {
+    html: doc.html,
+    source_md: doc.sourceMd,
+  })
+  if (!putRes.ok) await fail("republish failed", putRes)
+  const data = await jsonOf(putRes)
+  console.log(`republished https://${HOST}/${target}/ (v${String(data["version"])})`)
+  if (doc.isDir) await uploadAssets(ns, slug, inputPath)
 } else if (command === "pull" && target !== undefined) {
   const token = requireToken()
   const [ns, slug] = splitSiteId(target)
@@ -225,7 +252,8 @@ if (command === "publish" && target !== undefined) {
   console.log(`deleted ${target}`)
 } else {
   console.error(`usage:
-  bun dossier.ts publish <file.html|dir> [--slug=x] [--namespace=x]
+  bun dossier.ts publish <file.html|dir> --slug=x [--namespace=x]   # create; never overwrites
+  bun dossier.ts republish <ns/slug> <file.html|dir>                # update; same URL, new version
   bun dossier.ts pull <ns/slug> [outdir]
   bun dossier.ts list [namespace]
   bun dossier.ts comment <ns/slug> <text>
