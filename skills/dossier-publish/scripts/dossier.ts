@@ -1,7 +1,7 @@
 import { execSync } from "node:child_process"
 import { existsSync, mkdirSync, readFileSync, readdirSync, statSync, writeFileSync } from "node:fs"
 import { homedir } from "node:os"
-import { basename, join, relative, resolve } from "node:path"
+import { basename, join, relative, resolve, sep } from "node:path"
 
 const HOST = process.env["DOSSIER_HOST"] ?? "teambrilliant.dev"
 const TOKEN = process.env["DOSSIER_TOKEN"]
@@ -44,6 +44,58 @@ function detectNamespace(): string {
   } catch {
     return "scratch"
   }
+}
+
+function detectGithubOrigin(): { repo: string; branch: string } | null {
+  let url: string
+  try {
+    url = execSync("git remote get-url origin", { stdio: ["ignore", "pipe", "ignore"] })
+      .toString()
+      .trim()
+  } catch {
+    return null
+  }
+  const m = url.match(/github\.com[:/]+([^/]+)\/([^/]+?)(\.git)?\/?$/)
+  if (m === null || m[1] === undefined || m[2] === undefined) return null
+  let branch: string
+  try {
+    branch = execSync("git rev-parse --abbrev-ref HEAD", { stdio: ["ignore", "pipe", "ignore"] })
+      .toString()
+      .trim()
+  } catch {
+    return null
+  }
+  if (branch.length === 0 || branch === "HEAD") return null // detached HEAD: no stable branch to link
+  return { repo: `${m[1]}/${m[2]}`, branch }
+}
+
+// Links the sibling markdown for a single-file doc (the true source; the .html is a
+// build artifact) or the directory itself for a bundle, since a bundle has no one
+// canonical file. Returns undefined for anything that isn't cleanly linkable —
+// non-GitHub remote, detached HEAD, or the published path living outside the repo.
+function githubSource(
+  inputPath: string,
+  doc: { sourceMd: string | undefined; isDir: boolean },
+): { source_url: string; source_path: string } | undefined {
+  const origin = detectGithubOrigin()
+  if (origin === null) return undefined
+  let repoRoot: string
+  try {
+    repoRoot = execSync("git rev-parse --show-toplevel", { stdio: ["ignore", "pipe", "ignore"] })
+      .toString()
+      .trim()
+  } catch {
+    return undefined
+  }
+  const target = doc.isDir
+    ? inputPath
+    : doc.sourceMd !== undefined
+      ? inputPath.replace(/\.html$/, ".md")
+      : inputPath
+  const rel = relative(repoRoot, target).split(sep).join("/")
+  if (rel.length === 0 || rel.startsWith("..")) return undefined
+  const kind = doc.isDir ? "tree" : "blob"
+  return { source_url: `https://github.com/${origin.repo}/${kind}/${origin.branch}/${rel}`, source_path: rel }
 }
 
 function requireToken(): string {
@@ -154,6 +206,7 @@ if (command === "publish" && target !== undefined) {
   const namespace = flagValue(rest, "namespace") ?? detectNamespace()
   const siteId = `${namespace}/${slug}`
   const doc = readDoc(inputPath)
+  const source = githubSource(inputPath, doc)
   const only = flagValue(rest, "only")
 
   const createRes = await req("POST", "/sites", token, {
@@ -161,6 +214,8 @@ if (command === "publish" && target !== undefined) {
     slug,
     html: doc.html,
     source_md: doc.sourceMd,
+    source_url: source?.source_url,
+    source_path: source?.source_path,
     restricted_to:
       only === undefined
         ? undefined
@@ -187,6 +242,7 @@ if (command === "publish" && target !== undefined) {
   const updateKey = str(data, "update_key")
   if (updateKey !== null) saveKey(siteId, updateKey)
   console.log(`published ${url ?? siteId}`)
+  if (source) console.log(`  source: ${source.source_url}`)
   const restrictedTo = data["restricted_to"]
   if (Array.isArray(restrictedTo) && restrictedTo.length > 0)
     console.log(`  restricted to: ${restrictedTo.join(", ")}`)
@@ -195,14 +251,18 @@ if (command === "publish" && target !== undefined) {
   const [ns, slug] = splitSiteId(target)
   const inputPath = resolve(rest[0])
   const doc = readDoc(inputPath)
+  const source = githubSource(inputPath, doc)
   const key = await keyFor(target)
   const putRes = await req("PUT", `/sites/${ns}/${slug}`, key, {
     html: doc.html,
     source_md: doc.sourceMd,
+    source_url: source?.source_url,
+    source_path: source?.source_path,
   })
   if (!putRes.ok) await fail("republish failed", putRes)
   const data = await jsonOf(putRes)
   console.log(`republished https://${HOST}/${target}/ (v${String(data["version"])})`)
+  if (source) console.log(`  source: ${source.source_url}`)
   if (doc.isDir) await uploadAssets(ns, slug, inputPath)
 } else if (command === "pull" && target !== undefined) {
   const token = requireToken()

@@ -55,6 +55,14 @@ bun scripts/dossier.ts republish <ns>/<slug> <file.html|dir>
 Bundle notes: dotfiles and `CLAUDE.md` are never uploaded; comments attach to the bundle
 as a whole (one thread, shown on every page).
 
+### Source link (automatic)
+
+When the repo's `origin` remote points at github.com, `publish`/`republish`
+automatically attach a link to the doc's source on GitHub — the sibling `.md` file (or
+its containing directory, for bundles) at the current branch. No flag needed; silently
+no-ops for non-GitHub remotes, a detached `HEAD`, or files outside the repo. Shows in
+the panel header on the published page.
+
 - Namespace defaults to the current repo name (git remote); `--namespace=scratch` for
   repo-less docs. URL: `https://teambrilliant.dev/<namespace>/<slug>/`.
 - `update_key`s are cached in `~/.config/dossier/keys.json` (machine-local). On a fresh
