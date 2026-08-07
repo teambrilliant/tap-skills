@@ -98,7 +98,7 @@ Assess six areas. Mark ✓ (available) or ✗ (missing/incomplete) for each item
 - `.tap/product.md`: exists? ≤ 80 lines? `mtime` within 90 days?
 - If missing or stale, flag in Leverage Points with fix: run `/tap-skills:curate-product-context`
 
-This dimension assesses whether durable product-strategic context (what we build, audience, current focus, bets, non-goals) is installed as an agent-readable artifact. This skill does NOT author or modify `.tap/product.md` — that's `/tap-skills:curate-product-context`'s job.
+This dimension assesses whether durable product-strategic context (vision, what we build, audience, current focus, bets, non-goals) is installed as an agent-readable artifact. This skill does NOT author or modify `.tap/product.md` — that's `/tap-skills:curate-product-context`'s job.
 
 **MCP Servers** (from .mcp.json)
 - List each configured server and what it enables

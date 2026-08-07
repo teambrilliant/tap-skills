@@ -2,6 +2,27 @@
 
 All notable changes to this package are documented here. Versions follow [Semantic Versioning](https://semver.org/).
 
+## [0.17.0]
+
+### Vision lands in `.tap/product.md`; `tech-roadmap` retired
+
+**Removed**
+- **`tech-roadmap` skill removed.** It was built for a single purpose — helping assemble a board/budget roadmap — and never became part of the loop. Its Step 3 also carried a defect: it claimed `.tap/product.md` held the product vision and reconstructed a "3-10 year vision" out of `What we build` (present tense) plus `Current focus` (this quarter). That's a status report wearing a vision's name. Removing the skill removes the fiction; the Vision section below removes the gap. Also dropped: the README row and `curate-product-context`'s handoff recommending it on a focus shift.
+
+**Added**
+- **`curate-product-context` — new Vision section**, first in the file, making the artifact six sections instead of five. 1-2 sentences on how the customer's world differs 3-10 years out. Three things keep it from becoming filler: a **cathedral test** run on every draft (is this a cathedral or a wall? could a competitor sign it unchanged? does it name a changed world or a changed company?), `not yet articulated` as an explicit valid value, and **confirm-not-churn** handling in review/refresh — a vision rewritten every quarter was never a vision, so a change is surfaced as a pivot and asked about rather than silently accepted.
+- **Current focus now traces upward** — one question after the focus is captured: does it move toward the Vision? "No" is allowed and often correct (survival work, table stakes), but it gets named. Unremarked "no"s accumulating is the condition this file exists to make visible.
+- **Bet test** — bets were the least-scrutinized content in the file and the most load-bearing: Audience and Non-goals each get a three-check Principle loop, Vision now gets the cathedral test, while bets were captured from a single prompt and accepted as given — and `/dev-skills:shaping-work` checks every shaped feature against them. Four checks now run per bet: *could this be wrong?* (a direction can't be — "improve onboarding" vs "users who hit the checklist activate at 2×"), *what kills it?* (no kill condition = a commitment wearing a bet's clothes, and it absorbs budget indefinitely), *does it follow from the insight or did you already want to build it?* (the reverse-justified feature is the common failure — test by asking what the insight predicts if you'd never thought of the feature), *what does being wrong cost?* (expensive → it's an experiment, route to `/dev-skills:product-discovery` before it enters the file). Explicitly refuses the escape hatch: don't soften a bet into a direction to make it pass check 1.
+- **Kill conditions are now part of the format** — `Each: [what we're trying + why we think it'll work] — kill: [what we'd have to see to stop]`. A test that shapes the artifact beats one that gets asked and evaporates.
+- **`How we win`** — one line under `What we build`: the structural advantage, not a feature. Pushed once if the answer is a feature ("could a competitor ship that next quarter?"); `no structural advantage yet — competing on execution` is valid, common, and decision-changing (it means speed matters more than moats this year). Deliberately not a new section — the file's value is compression.
+- **Review mode: bets resolve, they don't accumulate** — each existing bet is asked `paid off / killed / still open?`. Twice "still open" across reviews means either no kill signal or nobody watching; say which. Bets are the only section where the right answer is often deletion.
+
+**Changed**
+- Section renumbering throughout `curate-product-context` (Principle lines now on sections 3 and 6), format spec, example, `tap-audit`'s Strategic Context description, README, and the CLAUDE.md discoverability index line — all now name vision.
+
+**Internal**
+- Synced `package.json` (was 0.13.0) to `.claude-plugin/plugin.json`. CHANGELOG entries for 0.14.0–0.16.0 were never written; their commits are in `git log`.
+
 ## [0.13.0]
 
 ### Rename: `publish` → `dossier-publish`; discoverability wiring everywhere
