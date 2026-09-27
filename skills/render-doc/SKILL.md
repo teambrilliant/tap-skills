@@ -43,7 +43,7 @@ Publish the outdir as a directory bundle with `tap-skills:dossier-publish`.
 
 ## Workflow fit
 
-1. A planning skill produces `thoughts/plans/<name>.md` (or research/shape doc).
+1. A planning skill produces `thoughts/plans/<name>.md` (or a shape in `thoughts/shapes/`, or a research doc in `thoughts/research/`).
 2. `render.ts` → `<name>.html` next to it.
 3. Optionally publish: `/tap-skills:dossier-publish` uploads the HTML (and the md as source) to
    teambrilliant.dev.
