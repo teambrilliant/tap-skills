@@ -137,7 +137,7 @@ An atlas is only read by agents that know it exists — CLAUDE.md is the only fi
 ## Handoffs
 
 - **Unsure who the flow serves / what the layers should be** → `/dev-skills:product-thinker` (the user defines the layers).
-- **A mapped flow's acceptance rows are ready to build** → `/dev-skills:shaping-work` then `/dev-skills:implementation-planning` (the grid feeds shaping).
+- **A mapped flow's acceptance rows are ready to build** → `/dev-skills:shaping-work` then `/dev-skills:write-plan` (the grid feeds shaping).
 - **First scaffold in a new repo** → recommend `/tap-skills:curate-product-context` so `.tap/product.md` can seed future layers.
 
 ## Boundaries

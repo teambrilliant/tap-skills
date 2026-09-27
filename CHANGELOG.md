@@ -2,6 +2,13 @@
 
 All notable changes to this package are documented here. Versions follow [Semantic Versioning](https://semver.org/).
 
+## [0.17.1]
+
+### Follow dev-skills 3.0.0 renames
+
+- `alignment-atlas` handoff: `/dev-skills:implementation-planning` → `/dev-skills:write-plan`.
+- `render-doc`: shapes now live in `thoughts/shapes/`.
+
 ## [0.17.0]
 
 ### Vision lands in `.tap/product.md`; `tech-roadmap` retired
