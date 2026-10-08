@@ -85,13 +85,15 @@ Be specific in the fix content: name the exact rule, hook, or skill change. "Add
 Open with the signature block:
 
 ```
-`★ Tighten Loop ──────────────────────────────────`
+`★ Tighten Loop ─────`
 [N] steers harvested — [N context] / [N harness] / [N feedback] / [N scope]
   ├─ [most impactful finding]
   ├─ [second]
   └─ [top recommended fix]
-`─────────────────────────────────────────────────`
+`───── ★`
 ```
+
+Close with the `───── ★` line exactly as shown — tools read it.
 
 Then present each steer in a table. Lead with the highest-leverage findings — the ones that would prevent the most repeated friction. Mark repeats explicitly:
 

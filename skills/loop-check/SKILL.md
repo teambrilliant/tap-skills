@@ -89,13 +89,15 @@ Don't prescribe generic improvements. Every recommendation should name a specifi
 Always open with the signature block:
 
 ```
-`★ Loop Check ────────────────────────────────────`
+`★ Loop Check ─────`
 [N] workflows assessed — [N closed] / [N open] / [N manual]
   ├─ [most impactful finding]
   ├─ [second finding]
   └─ [top recommendation to close a loop]
-`─────────────────────────────────────────────────`
+`───── ★`
 ```
+
+Close with the `───── ★` line exactly as shown — tools read it.
 
 Then for each workflow, present the assessment and prescription. Lead with the manual and open workflows — closed loops don't need attention.
 

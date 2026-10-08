@@ -211,13 +211,15 @@ If `.tap/architecture.md` already exists, review it against what you discovered 
 Always open with the signature block:
 
 ```
-`★ Audit View ────────────────────────────────────`
+`★ Audit View ─────`
 [repo name] — [readiness score]
   ├─ [top feedback loop finding]
   ├─ [#1 leverage point]
   └─ [cheapest fix to start with]
-`─────────────────────────────────────────────────`
+`───── ★`
 ```
+
+Close with the `───── ★` line exactly as shown — tools read it.
 
 Then:
 - Summarize readiness score and what it means
