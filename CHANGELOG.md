@@ -2,6 +2,15 @@
 
 All notable changes to this package are documented here. Versions follow [Semantic Versioning](https://semver.org/).
 
+## [0.19.0]
+
+### `blast-radius` leads with decisions, reads in plain words
+
+- New **Surface decisions** step: calls the change made that the plan/shape/ticket didn't. Starts from the plan's `## Decisions` log (dev-skills `execute-plan`), checks it against the diff, adds what it missed `(not in log)`. Each is one plain line with a verdict — fine / looks wrong / your call — least sure first. Reported, never fixed.
+- **Size and new surfaces**: net prod vs test lines, plus what someone now owns (tables, endpoints, crons, deps, env vars, flags). Out-of-proportion size is flagged as scope creep.
+- Default diff (no PR/branch given) is now against the merge-base, so uncommitted changes and untracked files are included.
+- Report template cut from 9 sections to 6: ripple effects, shared state, blind spots and test gaps merge into one ranked "What could break" list; Changes table, Impact Map tiers and Summary dropped. Plain sentences, facts verbatim, empty sections omitted.
+
 ## [0.17.1]
 
 ### Follow dev-skills 3.0.0 renames
