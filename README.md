@@ -1,5 +1,7 @@
 # tap-skills
 
+> **Deprecated.** These skills moved to [teambrilliant/tap](https://github.com/teambrilliant/tap), split between the `tap` and `tap-labs` plugins. This repo is archived and no longer updated. Install: `/plugin install tap@teambrilliant-marketplace`.
+
 The operating system for human+agent dev teams. Enables agents to work autonomously and helps human developers support them effectively.
 
 Two questions TAP answers:
